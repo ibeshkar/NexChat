@@ -1,3 +1,5 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -6,6 +8,12 @@ plugins {
     id("kotlin-kapt")
     id("dagger.hilt.android.plugin")
     alias(libs.plugins.google.gms.google.services)
+}
+
+val localProperties = Properties()
+val localPropertiesFile = rootProject.file("local.properties")
+if (localPropertiesFile.exists()) {
+    localProperties.load(localPropertiesFile.inputStream())
 }
 
 android {
@@ -17,9 +25,12 @@ android {
         minSdk = 24
         targetSdk = 35
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val webClientId: String = localProperties.getProperty("Firebase_Web_Client_ID") ?: "default_key"
+        buildConfigField("String", "Firebase_Web_Client_ID", "\"$webClientId\"")
     }
 
     buildTypes {
@@ -40,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 }
 
@@ -61,6 +73,9 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
+    // Material design
+    implementation(libs.androidx.material.icons.extended)
+
     // Splash Screen
     implementation(libs.androidx.core.splashscreen)
 
@@ -69,8 +84,18 @@ dependencies {
     kapt(libs.hilt.compiler)
 
     // Firebase services
+    implementation(libs.play.services.auth)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.auth.ktx)
+    implementation (libs.androidx.credentials)
+    implementation (libs.androidx.credentials.play.services.auth)
+    implementation (libs.googleid)
+
+    // Facebook Login SDK
+    implementation(libs.facebook.login)
+
+    // Coroutines support for Firebase Tasks
+    implementation(libs.kotlinx.coroutines.play.services)
 
     // Navigation
     implementation(libs.androidx.navigation.compose)

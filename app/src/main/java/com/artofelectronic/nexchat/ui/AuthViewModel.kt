@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.artofelectronic.nexchat.data.models.User
 import com.artofelectronic.nexchat.domain.usecases.CheckUserSignInStatusUseCase
+import com.artofelectronic.nexchat.domain.usecases.SignInWithEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithFacebookUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithGoogleUseCase
@@ -31,7 +32,8 @@ class AuthViewModel @Inject constructor(
     private val signupWithEmailUseCase: SignupWithEmailUseCase,
     private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
     private val signInWithTwitterUseCase: SignInWithTwitterUseCase,
-    private val signInWithFacebook: SignInWithFacebookUseCase
+    private val signInWithFacebook: SignInWithFacebookUseCase,
+    private val signInWithEmailUseCase: SignInWithEmailUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Loading)
@@ -67,7 +69,7 @@ class AuthViewModel @Inject constructor(
             try {
                 signupWithEmailUseCase(email, password).addOnCompleteListener { resultTask ->
                     if (resultTask.isSuccessful) {
-                        resultTask.result?.user?.let { createUserDetailsInFirestore(it) }
+                        resultTask.result?.user?.let { createUserDetailsInFirestoreIfRequired(it) }
                     } else {
                         _signupState.value =
                             SignupState.Error(
@@ -91,9 +93,9 @@ class AuthViewModel @Inject constructor(
                 result.getOrNull()?.let {
                     FirebaseUtil.signInWithFirebase(it).addOnCompleteListener { task ->
                         if (task.isSuccessful) {
-                            _signupState.value = SignupState.Success()
-                            val user = task.result?.user
-                            createUserDetailsInFirestore(user!!)
+                            task.result?.user?.let { user ->
+                                createUserDetailsInFirestoreIfRequired(user)
+                            }
                         } else {
                             _signupState.value =
                                 SignupState.Error(
@@ -132,7 +134,7 @@ class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             val result = signInWithTwitterUseCase(activity)
             if (result.isSuccess) {
-                result.getOrNull()?.let { createUserDetailsInFirestore(it) }
+                result.getOrNull()?.let { createUserDetailsInFirestoreIfRequired(it) }
             } else {
                 _signupState.value =
                     SignupState.Error(result.exceptionOrNull()?.message ?: "Unknown error occurred")
@@ -141,9 +143,27 @@ class AuthViewModel @Inject constructor(
     }
 
     /**
-     * Creates user details in Firestore using the provided FirebaseUser.
+     * Creates user details in Firestore if required.
      */
-    private fun createUserDetailsInFirestore(user: FirebaseUser) {
+    private fun createUserDetailsInFirestoreIfRequired(user: FirebaseUser) {
+        FirebaseUtil.currentUserDetails().get().addOnSuccessListener { documentSnapshot ->
+            if (!documentSnapshot.exists()) {
+                createUserRecord(user)
+            } else {
+                _signupState.value = SignupState.Success()
+            }
+        }.addOnFailureListener { exception ->
+            _signupState.value =
+                SignupState.Error(
+                    exception.message ?: "Unknown error occurred"
+                )
+        }
+    }
+
+    /**
+     * Creates a user record in Firestore using the provided FirebaseUser.
+     */
+    private fun createUserRecord(user: FirebaseUser) {
         val newUser = User(
             uid = user.uid,
             email = user.email ?: "",
@@ -157,6 +177,29 @@ class AuthViewModel @Inject constructor(
             } else {
                 _signupState.value =
                     SignupState.Error(task.exception?.message ?: "Unknown error occurred")
+            }
+        }
+    }
+
+    /**
+     * Signs in with email and password.
+     */
+    fun signInWithEmail(email: String, password: String) {
+        _signupState.value = SignupState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                signInWithEmailUseCase(email, password).addOnCompleteListener { resultTask ->
+                    if (resultTask.isSuccessful) {
+                        _signupState.value = SignupState.Success()
+                    } else {
+                        _signupState.value =
+                            SignupState.Error(
+                                resultTask.exception?.message ?: "Unknown error occurred"
+                            )
+                    }
+                }
+            } catch (e: Exception) {
+                _signupState.value = SignupState.Error(e.message ?: "Unknown error occurred")
             }
         }
     }

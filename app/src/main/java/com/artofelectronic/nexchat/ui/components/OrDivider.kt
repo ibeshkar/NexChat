@@ -29,7 +29,7 @@ fun OrDivider() {
             color = Color.Gray
         )
         Text(
-            text = "or Sign up with",
+            text = "or Sign In with",
             modifier = Modifier.padding(horizontal = 8.dp),
             color = Color.Gray,
             fontSize = 14.sp

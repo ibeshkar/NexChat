@@ -72,7 +72,7 @@ object FirebaseUtil {
     /**
      * Returns a DocumentReference for the current user's details in Firestore.
      */
-    private fun currentUserDetails(): DocumentReference {
+    fun currentUserDetails(): DocumentReference {
         return FirebaseFirestore.getInstance().collection("users")
             .document(FirebaseAuth.getInstance().currentUser!!.uid)
     }

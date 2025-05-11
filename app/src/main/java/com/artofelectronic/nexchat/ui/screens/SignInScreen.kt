@@ -56,10 +56,10 @@ import com.artofelectronic.nexchat.data.repository.FirebaseAuthRepository
 import com.artofelectronic.nexchat.data.repository.SignupRepositoryImpl
 import com.artofelectronic.nexchat.domain.usecases.CheckUserSignInStatusUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithEmailUseCase
-import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithFacebookUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithGoogleUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithTwitterUseCase
+import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
 import com.artofelectronic.nexchat.ui.AuthViewModel
 import com.artofelectronic.nexchat.ui.components.AuthProvider
 import com.artofelectronic.nexchat.ui.components.FullScreenLoadingDialog
@@ -75,26 +75,22 @@ import com.facebook.login.LoginManager
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun SignupScreen(
+fun SignInScreen(
     navController: NavController,
     viewModel: AuthViewModel
 ) {
 
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var confirmPassword by rememberSaveable { mutableStateOf("") }
 
     var passwordVisible by remember { mutableStateOf(false) }
-    var confirmPasswordVisible by remember { mutableStateOf(false) }
 
     var emailError by remember { mutableStateOf<String?>(null) }
     var passwordError by remember { mutableStateOf<String?>(null) }
-    var confirmPasswordError by remember { mutableStateOf<String?>(null) }
 
     var isLoading by remember { mutableStateOf(false) }
 
 
-    // Observes the signup state changes and handles the UI accordingly.
     LaunchedEffect(key1 = viewModel.signupState) {
         viewModel.signupState.collect { state ->
             when (state) {
@@ -108,7 +104,11 @@ fun SignupScreen(
 
                 is SignupState.Success -> {
                     isLoading = false
-                    navController.popBackStack()
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Start.route) {
+                            inclusive = true
+                        }
+                    }
                 }
 
                 is SignupState.Error -> {
@@ -249,58 +249,20 @@ fun SignupScreen(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
-                    OutlinedTextField(
-                        value = confirmPassword,
-                        onValueChange = {
-                            confirmPassword = it
-                            confirmPasswordError = null
-                        },
-                        isError = confirmPasswordError != null,
-                        modifier = Modifier.fillMaxWidth(),
-                        singleLine = true,
-                        placeholder = { Text(text = "Repeat Password") },
-                        leadingIcon = {
-                            Icon(Icons.Default.Lock, contentDescription = "Lock Icon")
-                        },
-                        trailingIcon = {
-                            val icon =
-                                if (confirmPasswordVisible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-                            IconButton(
-                                onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
-                                Icon(imageVector = icon, contentDescription = "Visibility Icon")
-                            }
-                        },
-                        shape = RoundedCornerShape(30.dp),
-                        colors = TextFieldDefaults.colors(
-                            focusedIndicatorColor = DarkerGreen,
-                            unfocusedIndicatorColor = Color.LightGray,
-                            focusedContainerColor = Color.Transparent,
-                            unfocusedContainerColor = Color.Transparent,
-                            focusedTextColor = DarkerGreen,
-                            unfocusedTextColor = DarkerGreen,
-                            focusedLeadingIconColor = DarkerGreen,
-                            unfocusedLeadingIconColor = DarkerGreen,
-                            focusedTrailingIconColor = DarkerGreen,
-                            unfocusedTrailingIconColor = DarkerGreen
-                        ),
-                        keyboardOptions = KeyboardOptions(
-                            keyboardType = KeyboardType.Password
-                        ),
-                        visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation()
+                    Text(
+                        text = AnnotatedString("Forgot password?"),
+                        modifier = Modifier
+                            .align(Alignment.End)
+                            .padding(end = 5.dp)
+                            .clickable {
+                                navController.navigate(Screen.ForgotPassword.route)
+                            },
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = DarkerGreen
                     )
-
-                    confirmPasswordError?.let {
-                        Text(
-                            it,
-                            color = Color.Red,
-                            style = MaterialTheme.typography.bodySmall,
-                            modifier = Modifier
-                                .align(Alignment.End)
-                                .padding(top = 2.dp, end = 8.dp)
-                        )
-                    }
 
                     Spacer(modifier = Modifier.height(20.dp))
 
@@ -308,12 +270,10 @@ fun SignupScreen(
                         onClick = {
                             emailError = InputValidator.validateEmail(email)
                             passwordError = InputValidator.validatePassword(password)
-                            confirmPasswordError =
-                                if (password != confirmPassword) "Passwords do not match" else null
 
-                            if (emailError == null && passwordError == null && confirmPasswordError == null) {
+                            if (emailError == null && passwordError == null) {
                                 isLoading = true
-                                viewModel.signupWithEmail(email, password)
+                                viewModel.signInWithEmail(email, password)
                             }
                         },
                         modifier = Modifier
@@ -324,13 +284,13 @@ fun SignupScreen(
                         )
                     ) {
                         Text(
-                            text = "Sign Up",
+                            text = "Sign In",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(50.dp))
+                    Spacer(modifier = Modifier.height(100.dp))
 
                     OrDivider()
 
@@ -376,18 +336,22 @@ fun SignupScreen(
 
                         Row(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                text = "Already have an account?",
+                                text = "Have no account?",
                                 fontSize = 14.sp,
                             )
 
                             Text(
-                                text = AnnotatedString(" Sign In"),
+                                text = AnnotatedString(" Sign up"),
                                 modifier = Modifier.clickable {
-                                    navController.navigate(Screen.SignIn.route)
+                                    navController.navigate(Screen.SignUp.route){
+                                        popUpTo(Screen.SignIn.route) {
+                                            inclusive = true
+                                        }
+                                    }
                                 },
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
-                                color = DarkerGreen,
+                                color = DarkerGreen
                             )
                         }
                     }
@@ -404,8 +368,8 @@ fun SignupScreen(
 
 @Preview
 @Composable
-fun SignupScreenPreview() {
-    SignupScreen(
+fun SignInScreenPreview() {
+    SignInScreen(
         navController = rememberNavController(),
         viewModel = AuthViewModel(
             CheckUserSignInStatusUseCase(

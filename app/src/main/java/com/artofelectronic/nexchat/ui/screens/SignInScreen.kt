@@ -31,6 +31,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,12 +50,16 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.artofelectronic.nexchat.R
 import com.artofelectronic.nexchat.data.repository.FirebaseAuthRepository
 import com.artofelectronic.nexchat.data.repository.SignupRepositoryImpl
 import com.artofelectronic.nexchat.domain.usecases.CheckUserSignInStatusUseCase
+import com.artofelectronic.nexchat.domain.usecases.SendPasswordResetEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithFacebookUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithGoogleUseCase
@@ -90,9 +95,24 @@ fun SignInScreen(
 
     var isLoading by remember { mutableStateOf(false) }
 
+    // Track lifecycle state
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var isVisible by remember { mutableStateOf(true) }
 
-    LaunchedEffect(key1 = viewModel.signupState) {
-        viewModel.signupState.collect { state ->
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            isVisible = event == Lifecycle.Event.ON_RESUME
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+
+    LaunchedEffect(key1 = viewModel.signInState, key2 = isVisible) {
+        viewModel.signInState.collect { state ->
             when (state) {
                 is SignupState.Idle -> {
                     isLoading = false
@@ -104,6 +124,8 @@ fun SignInScreen(
 
                 is SignupState.Success -> {
                     isLoading = false
+                    if (!isVisible) return@collect
+
                     navController.navigate(Screen.Home.route) {
                         popUpTo(Screen.Start.route) {
                             inclusive = true
@@ -113,7 +135,9 @@ fun SignInScreen(
 
                 is SignupState.Error -> {
                     isLoading = false
-                    Toast.makeText(navController.context, state.message, Toast.LENGTH_SHORT)
+                    if (!isVisible) return@collect
+
+                    Toast.makeText(navController.context, state.message, Toast.LENGTH_LONG)
                         .show()
                 }
             }
@@ -396,6 +420,9 @@ fun SignInScreenPreview() {
                 )
             ),
             SignInWithEmailUseCase(
+                FirebaseAuthRepository()
+            ),
+            SendPasswordResetEmailUseCase(
                 FirebaseAuthRepository()
             )
         )

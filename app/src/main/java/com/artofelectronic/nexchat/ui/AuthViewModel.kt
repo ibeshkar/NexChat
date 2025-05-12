@@ -9,6 +9,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.artofelectronic.nexchat.data.models.User
 import com.artofelectronic.nexchat.domain.usecases.CheckUserSignInStatusUseCase
+import com.artofelectronic.nexchat.domain.usecases.SendPasswordResetEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithFacebookUseCase
@@ -33,7 +34,8 @@ class AuthViewModel @Inject constructor(
     private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
     private val signInWithTwitterUseCase: SignInWithTwitterUseCase,
     private val signInWithFacebook: SignInWithFacebookUseCase,
-    private val signInWithEmailUseCase: SignInWithEmailUseCase
+    private val signInWithEmailUseCase: SignInWithEmailUseCase,
+    private val sendPasswordResetEmailUseCase: SendPasswordResetEmailUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<AuthUiState>(AuthUiState.Loading)
@@ -42,8 +44,14 @@ class AuthViewModel @Inject constructor(
     private val _signupState = MutableStateFlow<SignupState>(SignupState.Idle)
     val signupState: StateFlow<SignupState> get() = _signupState.asStateFlow()
 
+    private val _signInState = MutableStateFlow<SignupState>(SignupState.Idle)
+    val signInState: StateFlow<SignupState> get() = _signInState.asStateFlow()
+
     var socialSignInState by mutableStateOf<Result<FirebaseUser>?>(null)
         private set
+
+    private val _resetPasswordState = MutableStateFlow<SignupState>(SignupState.Idle)
+    val resetPasswordState: StateFlow<SignupState> get() = _resetPasswordState.asStateFlow()
 
     init {
         checkAuthenticationStatus()
@@ -185,21 +193,45 @@ class AuthViewModel @Inject constructor(
      * Signs in with email and password.
      */
     fun signInWithEmail(email: String, password: String) {
-        _signupState.value = SignupState.Loading
+        _signInState.value = SignupState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 signInWithEmailUseCase(email, password).addOnCompleteListener { resultTask ->
                     if (resultTask.isSuccessful) {
-                        _signupState.value = SignupState.Success()
+                        _signInState.value = SignupState.Success()
                     } else {
-                        _signupState.value =
+                        _signInState.value =
                             SignupState.Error(
                                 resultTask.exception?.message ?: "Unknown error occurred"
                             )
                     }
                 }
             } catch (e: Exception) {
-                _signupState.value = SignupState.Error(e.message ?: "Unknown error occurred")
+                _signInState.value = SignupState.Error(e.message ?: "Unknown error occurred")
+            }
+        }
+    }
+
+    /**
+     * Sends a password reset email to the provided email address.
+     */
+    fun sendPasswordResetEmail(email: String) {
+        _resetPasswordState.value = SignupState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                sendPasswordResetEmailUseCase(email).addOnCompleteListener { resultTask ->
+                    if (resultTask.isSuccessful) {
+                        FirebaseUtil.signOutFromFirebase()
+                        _resetPasswordState.value = SignupState.Success()
+                    } else {
+                        _resetPasswordState.value =
+                            SignupState.Error(
+                                resultTask.exception?.message ?: "Unknown error occurred"
+                            )
+                    }
+                }
+            } catch (e: Exception) {
+                _resetPasswordState.value = SignupState.Error(e.message ?: "Unknown error occurred")
             }
         }
     }

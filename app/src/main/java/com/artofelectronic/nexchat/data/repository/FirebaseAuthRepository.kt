@@ -10,4 +10,7 @@ class FirebaseAuthRepository : SignInRepository {
 
     override suspend fun signIn(email: String, password: String): Task<AuthResult> =
         FirebaseUtil.signInUserInFirebase(email, password)
+
+    override suspend fun resetPassword(email: String): Task<Void> =
+        FirebaseUtil.sendPasswordResetEmail(email)
 }

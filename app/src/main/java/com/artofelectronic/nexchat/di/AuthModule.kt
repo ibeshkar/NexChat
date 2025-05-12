@@ -5,6 +5,7 @@ import com.artofelectronic.nexchat.data.repository.SignupRepositoryImpl
 import com.artofelectronic.nexchat.domain.repository.SignInRepository
 import com.artofelectronic.nexchat.domain.repository.SignUpRepository
 import com.artofelectronic.nexchat.domain.usecases.CheckUserSignInStatusUseCase
+import com.artofelectronic.nexchat.domain.usecases.SendPasswordResetEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
 import com.google.firebase.auth.FirebaseAuth
@@ -52,5 +53,11 @@ object AuthModule {
     @Singleton
     fun provideSignInWithEmailUseCase(signInRepository: SignInRepository): SignInWithEmailUseCase {
         return SignInWithEmailUseCase(signInRepository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSendPasswordResetEmailUseCase(signInRepository: SignInRepository): SendPasswordResetEmailUseCase {
+        return SendPasswordResetEmailUseCase(signInRepository)
     }
 }

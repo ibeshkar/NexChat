@@ -65,7 +65,7 @@ object FirebaseUtil {
     /**
      * Signs out the current user from Firebase.
      */
-    private fun signOutFromFirebase() {
+    fun signOutFromFirebase() {
         FirebaseAuth.getInstance().signOut()
     }
 

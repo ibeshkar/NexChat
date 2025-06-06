@@ -15,9 +15,10 @@ import com.artofelectronic.nexchat.ui.screens.StartScreen
 @Composable
 fun Routing(
     navController: NavHostController,
+    startDestination: String,
     viewModel: ViewModel
 ) {
-    NavHost(navController = navController, startDestination = Screen.Start.route) {
+    NavHost(navController = navController, startDestination = startDestination) {
         composable(Screen.Start.route) {
             StartScreen(navController)
         }

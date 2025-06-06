@@ -130,7 +130,12 @@ fun SignupScreen(
                     isLoading = false
                     if (!isVisible) return@collect
 
-                    navController.popBackStack()
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(navController.graph.startDestinationId) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
 
                 is SignupState.Error -> {
@@ -141,6 +146,69 @@ fun SignupScreen(
                         .show()
                 }
             }
+        }
+    }
+
+    val onEmailChange = remember {
+        { newEmail: String ->
+            email = newEmail
+            emailError = null
+        }
+    }
+
+    val onPasswordChange = remember {
+        { pass: String ->
+            password = pass
+            passwordError = null
+        }
+    }
+
+    val onPasswordConfirmChange = remember {
+        { pass: String ->
+            confirmPassword = pass
+            confirmPasswordError = null
+        }
+    }
+
+    val onSignUpClickListener = remember {
+        {
+            emailError = InputValidator.validateEmail(email)
+            passwordError = InputValidator.validatePassword(password)
+            confirmPasswordError =
+                if (password != confirmPassword) "Passwords do not match" else null
+
+            if (emailError == null && passwordError == null && confirmPasswordError == null) {
+                isLoading = true
+                viewModel.signupWithEmail(email, password)
+            }
+        }
+    }
+
+    val onGoogleSignInClickListener = remember {
+        {
+            val context = navController.context
+            viewModel.signInWithGoogle(context)
+        }
+    }
+
+    val onFacebookSignInClickListener = remember {
+        {
+            LoginManager.getInstance().logInWithReadPermissions(
+                navController.context as Activity,
+                listOf("email", "public_profile")
+            )
+        }
+    }
+
+    val onTwitterSignInClickListener = remember {
+        {
+            viewModel.signInWithTwitter(navController.context as Activity)
+        }
+    }
+
+    val onSignInClickListener = remember {
+        Modifier.clickable {
+            navController.navigate(Screen.SignIn.route)
         }
     }
 
@@ -182,10 +250,7 @@ fun SignupScreen(
 
                     OutlinedTextField(
                         value = email,
-                        onValueChange = {
-                            email = it
-                            emailError = null
-                        },
+                        onValueChange = onEmailChange,
                         isError = emailError != null,
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
@@ -224,10 +289,7 @@ fun SignupScreen(
 
                     OutlinedTextField(
                         value = password,
-                        onValueChange = {
-                            password = it
-                            passwordError = null
-                        },
+                        onValueChange = onPasswordChange,
                         isError = passwordError != null,
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
@@ -277,10 +339,7 @@ fun SignupScreen(
 
                     OutlinedTextField(
                         value = confirmPassword,
-                        onValueChange = {
-                            confirmPassword = it
-                            confirmPasswordError = null
-                        },
+                        onValueChange = onPasswordConfirmChange,
                         isError = confirmPasswordError != null,
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
@@ -329,17 +388,7 @@ fun SignupScreen(
                     Spacer(modifier = Modifier.height(20.dp))
 
                     Button(
-                        onClick = {
-                            emailError = InputValidator.validateEmail(email)
-                            passwordError = InputValidator.validatePassword(password)
-                            confirmPasswordError =
-                                if (password != confirmPassword) "Passwords do not match" else null
-
-                            if (emailError == null && passwordError == null && confirmPasswordError == null) {
-                                isLoading = true
-                                viewModel.signupWithEmail(email, password)
-                            }
-                        },
+                        onClick = onSignUpClickListener,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),
@@ -367,27 +416,17 @@ fun SignupScreen(
                     ) {
                         SocialButton(
                             provider = AuthProvider.Google,
-                            onClick = {
-                                val context = navController.context
-                                viewModel.signInWithGoogle(context)
-                            }
+                            onClick = onGoogleSignInClickListener
                         )
 
                         SocialButton(
                             provider = AuthProvider.Facebook,
-                            onClick = {
-                                LoginManager.getInstance().logInWithReadPermissions(
-                                    navController.context as Activity,
-                                    listOf("email", "public_profile")
-                                )
-                            }
+                            onClick = onFacebookSignInClickListener
                         )
 
                         SocialButton(
                             provider = AuthProvider.Twitter,
-                            onClick = {
-                                viewModel.signInWithTwitter(navController.context as Activity)
-                            }
+                            onClick = onTwitterSignInClickListener
                         )
                     }
 
@@ -406,9 +445,7 @@ fun SignupScreen(
 
                             Text(
                                 text = AnnotatedString(" Sign In"),
-                                modifier = Modifier.clickable {
-                                    navController.navigate(Screen.SignIn.route)
-                                },
+                                modifier = onSignInClickListener,
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = DarkerGreen,

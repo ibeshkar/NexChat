@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class AuthViewModel @Inject constructor(
+open class AuthViewModel @Inject constructor(
     private val checkUserSignInStatusUseCase: CheckUserSignInStatusUseCase,
     private val signupWithEmailUseCase: SignupWithEmailUseCase,
     private val signInWithGoogleUseCase: SignInWithGoogleUseCase,
@@ -45,7 +45,7 @@ class AuthViewModel @Inject constructor(
     val signupState: StateFlow<SignupState> get() = _signupState.asStateFlow()
 
     private val _signInState = MutableStateFlow<SignupState>(SignupState.Idle)
-    val signInState: StateFlow<SignupState> get() = _signInState.asStateFlow()
+    open val signInState: StateFlow<SignupState> get() = _signInState.asStateFlow()
 
     var socialSignInState by mutableStateOf<Result<FirebaseUser>?>(null)
         private set
@@ -60,7 +60,7 @@ class AuthViewModel @Inject constructor(
     /**
      * Checks the authentication status of the user.
      */
-    private fun checkAuthenticationStatus() {
+    fun checkAuthenticationStatus() {
         viewModelScope.launch(Dispatchers.IO) {
             val isUserSignedIn = checkUserSignInStatusUseCase()
             _uiState.value =
@@ -95,6 +95,7 @@ class AuthViewModel @Inject constructor(
      * Signs in with Google using the provided context and web client ID.
      */
     fun signInWithGoogle(context: Context) {
+        _signupState.value = SignupState.Loading
         viewModelScope.launch {
             val result = signInWithGoogleUseCase(context)
             if (result.isSuccess) {
@@ -139,6 +140,7 @@ class AuthViewModel @Inject constructor(
      * Signs in with Twitter using the provided activity.
      */
     fun signInWithTwitter(activity: Activity) {
+        _signupState.value = SignupState.Loading
         viewModelScope.launch {
             val result = signInWithTwitterUseCase(activity)
             if (result.isSuccess) {
@@ -195,20 +197,7 @@ class AuthViewModel @Inject constructor(
     fun signInWithEmail(email: String, password: String) {
         _signInState.value = SignupState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                signInWithEmailUseCase(email, password).addOnCompleteListener { resultTask ->
-                    if (resultTask.isSuccessful) {
-                        _signInState.value = SignupState.Success()
-                    } else {
-                        _signInState.value =
-                            SignupState.Error(
-                                resultTask.exception?.message ?: "Unknown error occurred"
-                            )
-                    }
-                }
-            } catch (e: Exception) {
-                _signInState.value = SignupState.Error(e.message ?: "Unknown error occurred")
-            }
+            _signInState.value = signInWithEmailUseCase(email, password)
         }
     }
 
@@ -218,21 +207,7 @@ class AuthViewModel @Inject constructor(
     fun sendPasswordResetEmail(email: String) {
         _resetPasswordState.value = SignupState.Loading
         viewModelScope.launch(Dispatchers.IO) {
-            try {
-                sendPasswordResetEmailUseCase(email).addOnCompleteListener { resultTask ->
-                    if (resultTask.isSuccessful) {
-                        FirebaseUtil.signOutFromFirebase()
-                        _resetPasswordState.value = SignupState.Success()
-                    } else {
-                        _resetPasswordState.value =
-                            SignupState.Error(
-                                resultTask.exception?.message ?: "Unknown error occurred"
-                            )
-                    }
-                }
-            } catch (e: Exception) {
-                _resetPasswordState.value = SignupState.Error(e.message ?: "Unknown error occurred")
-            }
+            _resetPasswordState.value = sendPasswordResetEmailUseCase(email)
         }
     }
 }

@@ -124,6 +124,23 @@ fun ForgotPasswordScreen(
         }
     }
 
+    val onEmailChange = remember {
+        { newEmail: String ->
+            email = newEmail
+            emailError = null
+        }
+    }
+
+    val onSubmitClickListener = remember {
+        {
+            emailError = InputValidator.validateEmail(email)
+            if (emailError == null) {
+                isLoading = true
+                authViewModel.sendPasswordResetEmail(email)
+            }
+        }
+    }
+
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -181,10 +198,7 @@ fun ForgotPasswordScreen(
 
                     OutlinedTextField(
                         value = email,
-                        onValueChange = {
-                            email = it
-                            emailError = null
-                        },
+                        onValueChange = onEmailChange,
                         isError = emailError != null,
                         modifier = Modifier.fillMaxWidth(),
                         singleLine = true,
@@ -222,13 +236,7 @@ fun ForgotPasswordScreen(
                     Spacer(modifier = Modifier.height(30.dp))
 
                     Button(
-                        onClick = {
-                            emailError = InputValidator.validateEmail(email)
-                            if (emailError == null) {
-                                isLoading = true
-                                authViewModel.sendPasswordResetEmail(email)
-                            }
-                        },
+                        onClick = onSubmitClickListener,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(50.dp),

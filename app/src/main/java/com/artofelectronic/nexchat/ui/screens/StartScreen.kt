@@ -13,6 +13,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,12 +24,25 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.artofelectronic.nexchat.R
+import com.artofelectronic.nexchat.ui.navigation.Screen
 import com.artofelectronic.nexchat.ui.theme.AlmostWhite
 import com.artofelectronic.nexchat.ui.theme.DarkerGreen
 import com.artofelectronic.nexchat.ui.theme.LightMintGreen
 
 @Composable
 fun StartScreen(navController: NavController) {
+
+    val onSignInClickListener = remember {
+        {
+            navController.navigate(Screen.SignIn.route)
+        }
+    }
+
+    val onSignUpClickListener = remember {
+        {
+            navController.navigate(Screen.SignUp.route)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -71,7 +85,7 @@ fun StartScreen(navController: NavController) {
         )
 
         Button(
-            onClick = { navController.navigate("signIn") },
+            onClick = onSignInClickListener,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -91,7 +105,7 @@ fun StartScreen(navController: NavController) {
         )
 
         Button(
-            onClick = { navController.navigate("signUp") },
+            onClick = onSignUpClickListener,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),

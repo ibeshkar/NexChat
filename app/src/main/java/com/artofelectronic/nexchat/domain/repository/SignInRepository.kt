@@ -1,10 +1,9 @@
 package com.artofelectronic.nexchat.domain.repository
 
-import com.google.android.gms.tasks.Task
-import com.google.firebase.auth.AuthResult
+import com.artofelectronic.nexchat.ui.state.SignupState
 
 interface SignInRepository {
     suspend fun isUserSignedIn(): Boolean
-    suspend fun signIn(email: String, password: String): Task<AuthResult>
-    suspend fun resetPassword(email: String): Task<Void>
+    suspend fun signIn(email: String, password: String): SignupState
+    suspend fun resetPassword(email: String): SignupState
 }

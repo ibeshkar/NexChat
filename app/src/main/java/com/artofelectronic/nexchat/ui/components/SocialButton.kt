@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import com.artofelectronic.nexchat.R
 import com.artofelectronic.nexchat.ui.theme.DarkerGreen
@@ -21,8 +22,13 @@ fun SocialButton(provider: AuthProvider, onClick: () -> Unit) {
         AuthProvider.Facebook -> R.drawable.ic_facebook
         AuthProvider.Twitter -> R.drawable.ic_twitter
     }
+
+    val onClickListener = remember {
+        { onClick() }
+    }
+
     Button(
-        onClick = { onClick() },
+        onClick = onClickListener,
         modifier = Modifier.size(48.dp),
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(

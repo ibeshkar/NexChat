@@ -14,8 +14,8 @@ import com.artofelectronic.nexchat.domain.usecases.SignInWithFacebookUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithGoogleUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithTwitterUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
-import com.artofelectronic.nexchat.ui.AuthViewModel
-import com.artofelectronic.nexchat.ui.navigation.Screen
+import com.artofelectronic.nexchat.ui.viewmodels.AuthViewModel
+import com.artofelectronic.nexchat.ui.navigation.Screens
 import com.artofelectronic.nexchat.utils.FirebaseUtil
 import io.mockk.coEvery
 import io.mockk.every
@@ -25,7 +25,7 @@ import io.mockk.mockkObject
 
 fun createTestNavHostController(
     composeTestRule: AndroidComposeTestRule<*, ComponentActivity>,
-    startDestination: String = Screen.Start.route
+    startDestination: String = Screens.Start.route
 ): TestNavHostController {
 
     val navController = TestNavHostController(composeTestRule.activity)
@@ -39,10 +39,10 @@ fun createTestNavHostController(
             navController = navController,
             startDestination = startDestination
         ) {
-            composable(Screen.Start.route) { StartScreen(navController) }
-            composable(Screen.SignIn.route) { SignInScreen(navController, mockViewModel) }
-            composable(Screen.SignUp.route) { SignupScreen(navController, mockViewModel) }
-            composable(Screen.Home.route) { HomeScreen(navController) }
+            composable(Screens.Start.route) { StartScreen(navController) }
+            composable(Screens.SignIn.route) { SignInScreen(navController, mockViewModel) }
+            composable(Screens.SignUp.route) { SignupScreen(navController, mockViewModel) }
+            composable(Screens.Home.route) { HomeScreen(navController) }
         }
     }
     return navController

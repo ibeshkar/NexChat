@@ -1,5 +1,6 @@
 package com.artofelectronic.nexchat.ui.screens
 
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -54,7 +55,7 @@ import com.artofelectronic.nexchat.domain.usecases.SignInWithFacebookUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithGoogleUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithTwitterUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
-import com.artofelectronic.nexchat.ui.AuthViewModel
+import com.artofelectronic.nexchat.ui.viewmodels.AuthViewModel
 import com.artofelectronic.nexchat.ui.components.FullScreenLoadingDialog
 import com.artofelectronic.nexchat.ui.state.SignupState
 import com.artofelectronic.nexchat.ui.theme.AlmostWhite
@@ -261,6 +262,7 @@ fun ForgotPasswordScreen(
 
 }
 
+@SuppressLint("ViewModelConstructorInComposable")
 @Preview
 @Composable
 fun ForgotPasswordScreenPreview() {

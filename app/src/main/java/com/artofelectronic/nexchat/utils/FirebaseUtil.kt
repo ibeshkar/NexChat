@@ -80,7 +80,34 @@ object FirebaseUtil {
     /**
      * Creates a new user in Firestore with the provided User object.
      */
-    fun createUserInFirestore(user: User):Task<Void> {
+    fun createUserInFirestore(user: User): Task<Void> {
         return currentUserDetails().set(user)
+    }
+
+    /**
+     * Updates the user's display name in Firestore.
+     */
+    fun updateDisplayNameInFirestore(displayName: String): Task<Void> {
+        return currentUserDetails().update(DISPLAY_NAME_KEY, displayName)
+    }
+
+    /**
+     * Returns a DocumentReference for the chatroom with the given ID.
+     */
+    fun chatroomReference(chatroomId: String): DocumentReference {
+        return FirebaseFirestore.getInstance()
+            .collection(CHATROOM_COLLECTION)
+            .document(chatroomId)
+    }
+
+    /**
+     * Returns a Chatroom Id for the given two user IDs.
+     */
+    fun getChatroomId(firstUserId: String, secondUserId: String): String {
+        return if (firstUserId.hashCode() < secondUserId.hashCode()) {
+            firstUserId + "_" + secondUserId
+        } else {
+            secondUserId + "_" + firstUserId
+        }
     }
 }

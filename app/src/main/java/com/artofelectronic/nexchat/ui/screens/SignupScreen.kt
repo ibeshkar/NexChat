@@ -1,6 +1,7 @@
 package com.artofelectronic.nexchat.ui.screens
 
 import android.app.Activity
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -65,12 +66,14 @@ import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithFacebookUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithGoogleUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithTwitterUseCase
-import com.artofelectronic.nexchat.ui.AuthViewModel
+import com.artofelectronic.nexchat.ui.activities.AuthActivity
+import com.artofelectronic.nexchat.ui.activities.MainActivity
+import com.artofelectronic.nexchat.ui.viewmodels.AuthViewModel
 import com.artofelectronic.nexchat.ui.components.AuthProvider
 import com.artofelectronic.nexchat.ui.components.FullScreenLoadingDialog
 import com.artofelectronic.nexchat.ui.components.OrDivider
 import com.artofelectronic.nexchat.ui.components.SocialButton
-import com.artofelectronic.nexchat.ui.navigation.Screen
+import com.artofelectronic.nexchat.ui.navigation.Screens
 import com.artofelectronic.nexchat.ui.state.SignupState
 import com.artofelectronic.nexchat.ui.theme.AlmostWhite
 import com.artofelectronic.nexchat.ui.theme.DarkerGreen
@@ -130,11 +133,12 @@ fun SignupScreen(
                     isLoading = false
                     if (!isVisible) return@collect
 
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
+                    // Navigate to MainActivity on successful signup and finish the current activity
+                    val context = navController.context as AuthActivity
+                    Intent(navController.context, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        context.startActivity(this)
+                        (context as? AuthActivity)?.finish()
                     }
                 }
 
@@ -142,8 +146,7 @@ fun SignupScreen(
                     isLoading = false
                     if (!isVisible) return@collect
 
-                    Toast.makeText(navController.context, state.message, Toast.LENGTH_LONG)
-                        .show()
+                    Toast.makeText(navController.context, state.message, Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -208,7 +211,7 @@ fun SignupScreen(
 
     val onSignInClickListener = remember {
         Modifier.clickable {
-            navController.navigate(Screen.SignIn.route)
+            navController.navigate(Screens.SignIn.route)
         }
     }
 

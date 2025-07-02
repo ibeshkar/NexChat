@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.artofelectronic.nexchat.ui.AuthViewModel
+import com.artofelectronic.nexchat.ui.viewmodels.AuthViewModel
 import com.artofelectronic.nexchat.ui.screens.ForgotPasswordScreen
 import com.artofelectronic.nexchat.ui.screens.HomeScreen
 import com.artofelectronic.nexchat.ui.screens.SignInScreen
@@ -19,19 +19,19 @@ fun Routing(
     viewModel: ViewModel
 ) {
     NavHost(navController = navController, startDestination = startDestination) {
-        composable(Screen.Start.route) {
+        composable(Screens.Start.route) {
             StartScreen(navController)
         }
-        composable(Screen.SignUp.route) {
+        composable(Screens.SignUp.route) {
             SignupScreen(navController, viewModel as AuthViewModel)
         }
-        composable(Screen.SignIn.route) {
+        composable(Screens.SignIn.route) {
             SignInScreen(navController, viewModel as AuthViewModel)
         }
-        composable(Screen.ForgotPassword.route) {
+        composable(Screens.ForgotPassword.route) {
             ForgotPasswordScreen(navController, viewModel as AuthViewModel)
         }
-        composable(Screen.Home.route) {
+        composable(Screens.Home.route) {
             HomeScreen(navController)
         }
     }

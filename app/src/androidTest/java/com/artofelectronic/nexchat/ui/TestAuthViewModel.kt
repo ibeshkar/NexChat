@@ -3,6 +3,7 @@ package com.artofelectronic.nexchat.ui
 import com.artofelectronic.nexchat.FakeSignInRepository
 import com.artofelectronic.nexchat.domain.repository.SignInRepository
 import com.artofelectronic.nexchat.domain.usecases.SignInWithEmailUseCase
+import com.artofelectronic.nexchat.ui.viewmodels.AuthViewModel
 import io.mockk.mockk
 
 class TestAuthViewModel(

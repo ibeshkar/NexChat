@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.artofelectronic.nexchat.R
-import com.artofelectronic.nexchat.ui.navigation.Screen
+import com.artofelectronic.nexchat.ui.navigation.Screens
 import com.artofelectronic.nexchat.ui.theme.AlmostWhite
 import com.artofelectronic.nexchat.ui.theme.DarkerGreen
 import com.artofelectronic.nexchat.ui.theme.LightMintGreen
@@ -34,13 +34,13 @@ fun StartScreen(navController: NavController) {
 
     val onSignInClickListener = remember {
         {
-            navController.navigate(Screen.SignIn.route)
+            navController.navigate(Screens.SignIn.route)
         }
     }
 
     val onSignUpClickListener = remember {
         {
-            navController.navigate(Screen.SignUp.route)
+            navController.navigate(Screens.SignUp.route)
         }
     }
 

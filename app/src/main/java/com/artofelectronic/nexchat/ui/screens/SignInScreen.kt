@@ -1,6 +1,7 @@
 package com.artofelectronic.nexchat.ui.screens
 
 import android.app.Activity
+import android.content.Intent
 import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -66,12 +67,14 @@ import com.artofelectronic.nexchat.domain.usecases.SignInWithFacebookUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithGoogleUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithTwitterUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
-import com.artofelectronic.nexchat.ui.AuthViewModel
+import com.artofelectronic.nexchat.ui.activities.AuthActivity
+import com.artofelectronic.nexchat.ui.activities.MainActivity
+import com.artofelectronic.nexchat.ui.viewmodels.AuthViewModel
 import com.artofelectronic.nexchat.ui.components.AuthProvider
 import com.artofelectronic.nexchat.ui.components.FullScreenLoadingDialog
 import com.artofelectronic.nexchat.ui.components.OrDivider
 import com.artofelectronic.nexchat.ui.components.SocialButton
-import com.artofelectronic.nexchat.ui.navigation.Screen
+import com.artofelectronic.nexchat.ui.navigation.Screens
 import com.artofelectronic.nexchat.ui.state.SignupState
 import com.artofelectronic.nexchat.ui.theme.AlmostWhite
 import com.artofelectronic.nexchat.ui.theme.DarkerGreen
@@ -127,11 +130,11 @@ fun SignInScreen(
                     isLoading = false
                     if (!isVisible) return@collect
 
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(navController.graph.startDestinationId) {
-                            inclusive = true
-                        }
-                        launchSingleTop = true
+                    val context = navController.context
+                    Intent(context, MainActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        context.startActivity(this)
+                        (context as? AuthActivity)?.finish()
                     }
                 }
 
@@ -196,8 +199,8 @@ fun SignInScreen(
 
     val onSignUpClickListener = remember {
         Modifier.clickable {
-            navController.navigate(Screen.SignUp.route) {
-                popUpTo(Screen.SignIn.route) {
+            navController.navigate(Screens.SignUp.route) {
+                popUpTo(Screens.SignIn.route) {
                     inclusive = true
                 }
             }
@@ -337,7 +340,7 @@ fun SignInScreen(
                             .align(Alignment.End)
                             .padding(end = 5.dp)
                             .clickable {
-                                navController.navigate(Screen.ForgotPassword.route)
+                                navController.navigate(Screens.ForgotPassword.route)
                             },
                         fontSize = 14.sp,
                         fontWeight = FontWeight.Bold,

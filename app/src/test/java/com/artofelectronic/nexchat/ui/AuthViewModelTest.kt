@@ -10,6 +10,7 @@ import com.artofelectronic.nexchat.domain.usecases.SignInWithGoogleUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignInWithTwitterUseCase
 import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
 import com.artofelectronic.nexchat.ui.state.AuthUiState
+import com.artofelectronic.nexchat.ui.viewmodels.AuthViewModel
 import io.mockk.coEvery
 import io.mockk.mockk
 import org.junit.Test

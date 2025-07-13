@@ -1,14 +1,12 @@
 package com.artofelectronic.nexchat.domain.usecases
 
+
 import android.app.Activity
-import com.artofelectronic.nexchat.domain.repository.SignUpRepository
-import com.google.firebase.auth.FirebaseUser
+import com.artofelectronic.nexchat.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class SignInWithTwitterUseCase @Inject constructor(
-    private val repository: SignUpRepository
+    private val repository: AuthRepository
 ) {
-    suspend operator fun invoke(activity: Activity): Result<FirebaseUser> {
-        return repository.signInWithTwitter(activity)
-    }
+    suspend operator fun invoke(activity: Activity) = repository.signInWithTwitter(activity)
 }

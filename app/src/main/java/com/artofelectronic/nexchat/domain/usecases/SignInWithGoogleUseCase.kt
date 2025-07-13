@@ -1,13 +1,10 @@
 package com.artofelectronic.nexchat.domain.usecases
 
-import android.content.Context
-import com.artofelectronic.nexchat.domain.repository.SignUpRepository
+import com.artofelectronic.nexchat.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class SignInWithGoogleUseCase @Inject constructor(
-    private val signUpRepository: SignUpRepository
+    private val authRepository: AuthRepository
 ) {
-    suspend operator fun invoke(context: Context): Result<String> =
-        signUpRepository.signInWithGoogle(context)
-
+    suspend operator fun invoke() = authRepository.signInWithGoogle()
 }

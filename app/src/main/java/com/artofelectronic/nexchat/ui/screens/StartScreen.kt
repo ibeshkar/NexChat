@@ -13,36 +13,22 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.artofelectronic.nexchat.R
-import com.artofelectronic.nexchat.ui.navigation.Screens
 import com.artofelectronic.nexchat.ui.theme.AlmostWhite
 import com.artofelectronic.nexchat.ui.theme.DarkerGreen
 import com.artofelectronic.nexchat.ui.theme.LightMintGreen
+import com.artofelectronic.nexchat.utils.navigateToSignIn
+import com.artofelectronic.nexchat.utils.navigateToSignup
 
 @Composable
 fun StartScreen(navController: NavController) {
-
-    val onSignInClickListener = remember {
-        {
-            navController.navigate(Screens.SignIn.route)
-        }
-    }
-
-    val onSignUpClickListener = remember {
-        {
-            navController.navigate(Screens.SignUp.route)
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -85,7 +71,7 @@ fun StartScreen(navController: NavController) {
         )
 
         Button(
-            onClick = onSignInClickListener,
+            onClick = {navController.navigateToSignIn()},
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -105,7 +91,7 @@ fun StartScreen(navController: NavController) {
         )
 
         Button(
-            onClick = onSignUpClickListener,
+            onClick = { navController.navigateToSignup() },
             modifier = Modifier
                 .fillMaxWidth()
                 .height(50.dp),
@@ -122,10 +108,4 @@ fun StartScreen(navController: NavController) {
         }
 
     }
-}
-
-@Preview
-@Composable
-fun StartScreenPreview() {
-    StartScreen(navController = rememberNavController())
 }

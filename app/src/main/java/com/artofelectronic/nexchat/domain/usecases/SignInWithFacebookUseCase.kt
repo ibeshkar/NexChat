@@ -1,10 +1,10 @@
 package com.artofelectronic.nexchat.domain.usecases
 
-import com.artofelectronic.nexchat.domain.repository.SignUpRepository
+import com.artofelectronic.nexchat.domain.repository.AuthRepository
 import javax.inject.Inject
 
 class SignInWithFacebookUseCase @Inject constructor(
-    private val repo: SignUpRepository
+    private val authRepository: AuthRepository
 ) {
-    suspend operator fun invoke(token: String) = repo.signInWithFacebook(token)
+    suspend operator fun invoke(token: String) = authRepository.signInWithFacebook(token)
 }

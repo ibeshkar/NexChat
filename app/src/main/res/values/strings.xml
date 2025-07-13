@@ -3,4 +3,8 @@
     <string name="facebook_app_id">YOUR_FACEBOOK_APP_ID</string>
     <string name="facebook_client_token">YOUR_CLIENT_TOKEN</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="chats">Conversations</string>
+    <string name="no_conversations_found">No conversations found.</string>
+    <string name="chat_with">Chat with %1$s</string>
+    <string name="password_reset_email_sent">Password reset email sent</string>
 </resources>

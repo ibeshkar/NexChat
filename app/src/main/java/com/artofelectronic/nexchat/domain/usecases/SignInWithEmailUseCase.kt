@@ -1,9 +1,9 @@
 package com.artofelectronic.nexchat.domain.usecases
 
-import com.artofelectronic.nexchat.domain.repository.SignInRepository
+import com.artofelectronic.nexchat.domain.repository.AuthRepository
 import javax.inject.Inject
 
-class SignInWithEmailUseCase @Inject constructor(private val signInRepository: SignInRepository) {
+class SignInWithEmailUseCase @Inject constructor(private val authRepository: AuthRepository) {
     suspend operator fun invoke(email: String, password: String) =
-        signInRepository.signIn(email, password)
+        authRepository.signInWithEmail(email, password)
 }

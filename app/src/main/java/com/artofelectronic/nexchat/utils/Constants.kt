@@ -1,6 +1,5 @@
 package com.artofelectronic.nexchat.utils
 
-const val USER_COLLECTION = "users"
-const val CHATROOM_COLLECTION = "chatrooms"
-const val MESSAGES_COLLECTION = "messages"
-const val DISPLAY_NAME_KEY = "displayName"
+const val COLLECTION_USERS = "users"
+const val COLLECTION_CHATS = "chats"
+const val COLLECTION_MESSAGES = "messages"

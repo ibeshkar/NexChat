@@ -20,7 +20,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -85,15 +84,6 @@ fun SignInScreen(
         )
     }
 
-    // Automatically redirect on successful signup
-    LaunchedEffect(resultState) {
-        viewModel.markAccountExists(true)
-
-        if (resultState is AuthState.Success) {
-            navController.navigateToChats()
-        }
-    }
-
     SignInContent(
         uiState,
         onEmailChange = viewModel::onEmailChanged,
@@ -106,8 +96,27 @@ fun SignInScreen(
         onForgotPasswordClick = { navController.navigateToForgotPassword() }
     )
 
-    if (resultState is AuthState.Loading) {
-        FullScreenLoadingDialog()
+
+    when (resultState) {
+        is AuthState.Loading -> {
+            FullScreenLoadingDialog()
+        }
+
+        is AuthState.Success -> {
+            navController.navigateToChats()
+        }
+
+        is AuthState.Error -> {
+            Toast.makeText(
+                context,
+                (resultState as AuthState.Error).message,
+                Toast.LENGTH_SHORT
+            ).show()
+
+            viewModel.resetAuthState()
+        }
+
+        else -> {}
     }
 }
 
@@ -140,19 +149,16 @@ private fun SignInContent(
 
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .padding(16.dp)
                     .background(
                         color = AlmostWhite,
-                        shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
+                        shape = RoundedCornerShape(30.dp)
                     )
             ) {
                 Column(
                     modifier = Modifier
-                        .fillMaxSize()
-                        .padding(32.dp)
+                        .padding(24.dp)
                 ) {
-
-                    Spacer(modifier = Modifier.height(30.dp))
 
                     EmailField(
                         uiState.email,
@@ -160,7 +166,7 @@ private fun SignInContent(
                         onEmailChange
                     )
 
-                    Spacer(modifier = Modifier.height(20.dp))
+                    Spacer(modifier = Modifier.height(10.dp))
 
                     PasswordField(
                         label = "Password",
@@ -193,11 +199,11 @@ private fun SignInContent(
                         Text("Sign In", fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     }
 
-                    Spacer(modifier = Modifier.height(100.dp))
+                    Spacer(modifier = Modifier.height(50.dp))
 
                     OrDivider()
 
-                    Spacer(modifier = Modifier.height(50.dp))
+                    Spacer(modifier = Modifier.height(30.dp))
 
                     SocialAuthRow(
                         onGoogleClick = onGoogleClick,

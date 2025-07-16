@@ -3,16 +3,13 @@ package com.artofelectronic.nexchat.data.repository
 import com.artofelectronic.nexchat.data.datasource.local.db.ChatDao
 import com.artofelectronic.nexchat.data.models.Chat
 import com.artofelectronic.nexchat.data.models.ChatEntity
-import com.artofelectronic.nexchat.data.models.User
 import com.artofelectronic.nexchat.domain.repository.ChatRepository
 import com.artofelectronic.nexchat.utils.COLLECTION_CHATS
-import com.artofelectronic.nexchat.utils.COLLECTION_USERS
 import com.artofelectronic.nexchat.utils.NetworkResourceBoundary
 import com.artofelectronic.nexchat.utils.Resource
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 
@@ -31,7 +28,9 @@ class ChatRepositoryImpl @Inject constructor(
                     .get()
                     .await()
 
-                return snapshot.documents.mapNotNull { it.toObject(Chat::class.java) }
+                return snapshot.documents.mapNotNull {
+                    it.toObject(Chat::class.java)
+                }
             }
 
             override suspend fun saveRemoteData(data: List<Chat>) {
@@ -47,7 +46,7 @@ class ChatRepositoryImpl @Inject constructor(
                 chatDao.insertAll(entities)
             }
 
-            override suspend fun loadFromDb(): List<ChatEntity>? {
+            override suspend fun loadFromDb(): List<ChatEntity> {
                 return chatDao.getAllChats()
             }
 

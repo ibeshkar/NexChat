@@ -16,9 +16,9 @@ object InputValidator {
      * Validates the provided password.
      */
     fun validatePassword(password: String): String? {
-        val regex = Regex("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&])[A-Za-z\\d@\$!%*?&]{6,}$")
+        val regex = Regex("^(?=.*[A-Z])(?=.*[a-z])(?=.*\\d)(?=.*[@\$!%*?&_])[A-Za-z\\d@\$!%*?&_]{8,}$")
         return if (password.isBlank()) "Password is required"
-        else if (!regex.matches(password)) "Weak password (min 6 chars, 1 upper, 1 digit, 1 special)"
+        else if (!regex.matches(password)) "Weak password (min 8 chars, 1 upper, 1 digit, 1 special)"
         else null
     }
 }

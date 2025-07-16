@@ -10,10 +10,12 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.artofelectronic.nexchat.ui.navigation.AppNavigation
 import com.artofelectronic.nexchat.ui.navigation.Screens
+import com.artofelectronic.nexchat.ui.theme.LightMintGreen
 import com.artofelectronic.nexchat.utils.navigateToUserList
 
 @Composable
@@ -41,7 +43,8 @@ fun AppScaffold(startDestination: String) {
                     Icon(Icons.Default.Add, contentDescription = "New Chat")
                 }
             }
-        }
+        },
+        containerColor = LightMintGreen
     ) { padding ->
         AppNavigation(
             navController = navController,

@@ -42,7 +42,7 @@ fun ChatScreen(
             SendMessageBox {
                 viewModel.sendTextMessage(
                     chatId = chatId.orEmpty(),
-                    senderId = viewModel.getUserId().orEmpty(),
+                    senderId = viewModel.userId.value,
                     text = it
                 )
             }

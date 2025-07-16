@@ -1,10 +1,6 @@
 package com.artofelectronic.nexchat.ui.viewmodels
 
 import android.app.Activity
-import androidx.compose.runtime.State
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.artofelectronic.nexchat.data.models.User
@@ -21,8 +17,8 @@ import com.artofelectronic.nexchat.ui.state.AuthUiState
 import com.artofelectronic.nexchat.utils.InputValidator
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
-import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -41,8 +37,11 @@ open class AuthViewModel @Inject constructor(
     private val sendPasswordResetEmailUseCase: SendPasswordResetEmailUseCase
 ) : ViewModel() {
 
-    private val _isLoggedIn = mutableStateOf(checkUserLoggedInUseCase())
-    val isLoggedIn: State<Boolean> = _isLoggedIn
+    private val _isAuthStatusPending = MutableStateFlow(true)
+    val isAuthStatusPending: StateFlow<Boolean> = _isAuthStatusPending
+
+    private val _isLoggedIn = MutableStateFlow(false)
+    val isLoggedIn: StateFlow<Boolean> = _isLoggedIn
 
     private val _authUiState = MutableStateFlow(AuthUiState())
     val authUiState: StateFlow<AuthUiState> = _authUiState
@@ -52,10 +51,12 @@ open class AuthViewModel @Inject constructor(
 
     val facebookCallbackManager = CallbackManager.Factory.create()
 
-    private var accountExists by mutableStateOf(false)
 
-    fun markAccountExists(value: Boolean) {
-        accountExists = value
+    init {
+        viewModelScope.launch(Dispatchers.IO) {
+            _isLoggedIn.value = checkUserLoggedInUseCase()
+            _isAuthStatusPending.value = false
+        }
     }
 
 
@@ -69,6 +70,10 @@ open class AuthViewModel @Inject constructor(
 
     fun onConfirmPasswordChanged(confirm: String) {
         _authUiState.update { it.copy(confirmPassword = confirm, confirmPasswordError = null) }
+    }
+
+    fun resetAuthState() {
+        _authState.value = AuthState.Idle
     }
 
 
@@ -96,19 +101,24 @@ open class AuthViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                signupWithEmailUseCase(state.email, state.password)
-                val user = FirebaseAuth.getInstance().currentUser
-                user?.let {
+                val result = signupWithEmailUseCase(state.email, state.password)
+                if (result != null && result.user != null) {
+                    val user = result.user!!
                     createUserInFirestoreUseCase(
                         User(
-                            id = it.uid,
+                            id = user.uid,
                             email = state.email,
-                            name = it.displayName ?: it.email?.substringBefore("@").orEmpty(),
+                            name = user.displayName ?: user.email?.substringBefore("@").orEmpty(),
                             avatar = "" // Email signup has no avatar by default
                         )
                     )
+
+                    _authState.value = AuthState.Success
+                } else {
+                    _authState.value = AuthState.Error("Signup failed")
+                    _authUiState.update { it.copy(isLoading = false) }
+                    return@launch
                 }
-                _authState.value = AuthState.Success
             } catch (e: Exception) {
                 _authState.value = AuthState.Error(e.localizedMessage ?: "Signup failed")
                 _authUiState.update { it.copy(isLoading = false) }
@@ -121,21 +131,15 @@ open class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             try {
-                signInWithGoogleUseCase()
-
-                if (accountExists) {
-                    _authState.value = AuthState.Success
-                    return@launch
-                }
-
-                val user = FirebaseAuth.getInstance().currentUser
-                user?.let {
+                val result = signInWithGoogleUseCase()
+                if (result != null && result.user != null) {
+                    val user = result.user!!
                     createUserInFirestoreUseCase(
                         User(
-                            id = it.uid,
-                            email = it.email ?: "",
-                            name = it.displayName ?: "",
-                            avatar = it.photoUrl?.toString() ?: ""
+                            id = user.uid,
+                            email = user.email ?: "",
+                            name = user.displayName ?: user.email?.substringBefore("@").orEmpty(),
+                            avatar = user.photoUrl?.toString() ?: ""
                         )
                     )
                 }
@@ -152,21 +156,15 @@ open class AuthViewModel @Inject constructor(
         viewModelScope.launch {
             _authState.value = AuthState.Loading
             try {
-                signInWithFacebook(accessToken.token)
-
-                if (accountExists) {
-                    _authState.value = AuthState.Success
-                    return@launch
-                }
-
-                val user = FirebaseAuth.getInstance().currentUser
-                user?.let {
+                val result = signInWithFacebook(accessToken.token)
+                if (result != null && result.user != null) {
+                    val user = result.user!!
                     createUserInFirestoreUseCase(
                         User(
-                            id = it.uid,
-                            email = it.email ?: "",
-                            name = it.displayName ?: "",
-                            avatar = it.photoUrl?.toString() ?: ""
+                            id = user.uid,
+                            email = user.email ?: "",
+                            name = user.displayName ?: "",
+                            avatar = user.photoUrl?.toString() ?: ""
                         )
                     )
                 }
@@ -183,21 +181,15 @@ open class AuthViewModel @Inject constructor(
             _authState.value = AuthState.Loading
 
             try {
-                signInWithTwitterUseCase(activity)
-
-                if (accountExists) {
-                    _authState.value = AuthState.Success
-                    return@launch
-                }
-
-                val user = FirebaseAuth.getInstance().currentUser
-                user?.let {
+                val result = signInWithTwitterUseCase(activity)
+                if (result != null && result.user != null) {
+                    val user = result.user!!
                     createUserInFirestoreUseCase(
                         User(
-                            id = it.uid,
-                            email = it.email ?: "",
-                            name = it.displayName ?: "",
-                            avatar = it.photoUrl?.toString() ?: ""
+                            id = user.uid,
+                            email = user.email ?: "",
+                            name = user.displayName ?: "",
+                            avatar = user.photoUrl?.toString() ?: ""
                         )
                     )
                 }
@@ -214,15 +206,12 @@ open class AuthViewModel @Inject constructor(
 
         val emailError = InputValidator.validateEmail(state.email)
         val passwordError = InputValidator.validatePassword(state.password)
-        val confirmPasswordError =
-            if (state.password != state.confirmPassword) "Passwords do not match" else null
 
-        if (emailError != null || passwordError != null || confirmPasswordError != null) {
+        if (emailError != null || passwordError != null) {
             _authUiState.update {
                 it.copy(
                     emailError = emailError,
-                    passwordError = passwordError,
-                    confirmPasswordError = confirmPasswordError
+                    passwordError = passwordError
                 )
             }
             return
@@ -233,8 +222,14 @@ open class AuthViewModel @Inject constructor(
 
         viewModelScope.launch {
             try {
-                signInWithEmailUseCase(state.email, state.password)
-                _authState.value = AuthState.Success
+                val result = signInWithEmailUseCase(state.email, state.password)
+                if (result != null && result.user != null) {
+                    _authState.value = AuthState.Success
+                } else {
+                    _authState.value = AuthState.Error("SignIn failed")
+                    _authUiState.update { it.copy(isLoading = false) }
+                    return@launch
+                }
             } catch (e: Exception) {
                 _authState.value = AuthState.Error(e.localizedMessage ?: "SignIn failed")
                 _authUiState.update { it.copy(isLoading = false) }

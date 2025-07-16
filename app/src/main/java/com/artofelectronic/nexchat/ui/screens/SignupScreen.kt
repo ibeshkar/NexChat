@@ -20,7 +20,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -78,35 +77,50 @@ fun SignupScreen(
 
                 override fun onCancel() {}
                 override fun onError(error: FacebookException) {
-                    Toast.makeText(context, "Facebook sign-in failed-> ${error.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        context,
+                        "Facebook sign-in failed-> ${error.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
                 }
             }
         )
     }
 
-    // Automatically redirect on successful signup
-    LaunchedEffect(resultState) {
-        if (resultState is AuthState.Success) {
-            navController.navigateToChats()
-        }
-    }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        SignupContent(
-            uiState = uiState,
-            onEmailChange = viewModel::onEmailChanged,
-            onPasswordChange = viewModel::onPasswordChanged,
-            onConfirmPasswordChange = viewModel::onConfirmPasswordChanged,
-            onSignupClick = viewModel::signupWithEmail,
-            onGoogleClick =  viewModel::signupWithGoogle ,
-            onFacebookClick = onFacebookSignInClick,
-            onTwitterClick = { viewModel.signInWithTwitter(context as Activity) },
-            onNavigateToSignIn = { navController.navigate(Screens.SignIn.route) }
-        )
+    SignupContent(
+        uiState = uiState,
+        onEmailChange = viewModel::onEmailChanged,
+        onPasswordChange = viewModel::onPasswordChanged,
+        onConfirmPasswordChange = viewModel::onConfirmPasswordChanged,
+        onSignupClick = viewModel::signupWithEmail,
+        onGoogleClick = viewModel::signupWithGoogle,
+        onFacebookClick = onFacebookSignInClick,
+        onTwitterClick = { viewModel.signInWithTwitter(context as Activity) },
+        onNavigateToSignIn = { navController.navigate(Screens.SignIn.route) }
+    )
 
-        if (resultState is AuthState.Loading) {
+
+    when (resultState) {
+        is AuthState.Loading -> {
             FullScreenLoadingDialog()
         }
+
+        is AuthState.Success -> {
+            navController.navigateToChats()
+        }
+
+        is AuthState.Error -> {
+            Toast.makeText(
+                context,
+                (resultState as AuthState.Error).message,
+                Toast.LENGTH_SHORT
+            ).show()
+
+            viewModel.resetAuthState()
+        }
+
+        else -> {}
     }
 }
 
@@ -122,92 +136,96 @@ private fun SignupContent(
     onTwitterClick: () -> Unit,
     onNavigateToSignIn: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(LightMintGreen)
-    ) {
-        Image(
-            painter = painterResource(id = R.drawable.start_screen),
-            contentDescription = null,
-            modifier = Modifier
-                .size(200.dp)
-                .align(Alignment.CenterHorizontally)
-        )
-
-        Box(
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    AlmostWhite,
-                    shape = RoundedCornerShape(topStart = 30.dp, topEnd = 30.dp)
-                )
+                .background(LightMintGreen)
         ) {
-            Column(modifier = Modifier.padding(32.dp)) {
-                Spacer(Modifier.height(30.dp))
+            Image(
+                painter = painterResource(id = R.drawable.start_screen),
+                contentDescription = null,
+                modifier = Modifier
+                    .size(200.dp)
+                    .align(Alignment.CenterHorizontally)
+            )
 
-                EmailField(
-                    uiState.email,
-                    uiState.emailError,
-                    onEmailChange
-                )
-
-                Spacer(Modifier.height(20.dp))
-
-                PasswordField(
-                    label = "Password",
-                    password = uiState.password,
-                    error = uiState.passwordError,
-                    onPasswordChange = onPasswordChange
-                )
-
-                Spacer(Modifier.height(20.dp))
-
-                PasswordField(
-                    label = "Confirm Password",
-                    password = uiState.confirmPassword,
-                    error = uiState.confirmPasswordError,
-                    onPasswordChange = onConfirmPasswordChange
-                )
-
-                Spacer(Modifier.height(20.dp))
-
-                Button(
-                    onClick = onSignupClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(50.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = DarkerGreen)
-                ) {
-                    Text("Sign Up", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                }
-
-                Spacer(Modifier.height(50.dp))
-
-                OrDivider()
-
-                Spacer(Modifier.height(30.dp))
-
-                SocialAuthRow(
-                    onGoogleClick = onGoogleClick,
-                    onFacebookClick = onFacebookClick,
-                    onTwitterClick = onTwitterClick
-                )
-
-                Spacer(Modifier.height(32.dp))
-
-                Row(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text("Already have an account?", fontSize = 14.sp)
-                    Text(
-                        " Sign In",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = DarkerGreen,
-                        modifier = Modifier.clickable { onNavigateToSignIn() }
+            Box(
+                modifier = Modifier
+                    .padding(16.dp)
+                    .background(
+                        color = AlmostWhite,
+                        shape = RoundedCornerShape(30.dp)
                     )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                ) {
+
+                    EmailField(
+                        uiState.email,
+                        uiState.emailError,
+                        onEmailChange
+                    )
+
+                    Spacer(Modifier.height(10.dp))
+
+                    PasswordField(
+                        label = "Password",
+                        password = uiState.password,
+                        error = uiState.passwordError,
+                        onPasswordChange = onPasswordChange
+                    )
+
+                    Spacer(Modifier.height(10.dp))
+
+                    PasswordField(
+                        label = "Confirm Password",
+                        password = uiState.confirmPassword,
+                        error = uiState.confirmPasswordError,
+                        onPasswordChange = onConfirmPasswordChange
+                    )
+
+                    Spacer(Modifier.height(20.dp))
+
+                    Button(
+                        onClick = onSignupClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = DarkerGreen)
+                    ) {
+                        Text("Sign Up", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    }
+
+                    Spacer(Modifier.height(50.dp))
+
+                    OrDivider()
+
+                    Spacer(Modifier.height(30.dp))
+
+                    SocialAuthRow(
+                        onGoogleClick = onGoogleClick,
+                        onFacebookClick = onFacebookClick,
+                        onTwitterClick = onTwitterClick
+                    )
+
+                    Spacer(Modifier.height(32.dp))
+
+                    Row(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Already have an account?", fontSize = 14.sp)
+                        Text(
+                            " Sign In",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = DarkerGreen,
+                            modifier = Modifier.clickable { onNavigateToSignIn() }
+                        )
+                    }
                 }
             }
         }

@@ -15,6 +15,7 @@ import com.artofelectronic.nexchat.domain.usecases.LoadUsersUseCase
 import com.artofelectronic.nexchat.domain.usecases.RetrieveMessagesUseCase
 import com.artofelectronic.nexchat.domain.usecases.SendImageMessageUseCase
 import com.artofelectronic.nexchat.domain.usecases.SendTextMessageUseCase
+import com.artofelectronic.nexchat.utils.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -27,19 +28,23 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
+    private val getUserData: GetUserDataUseCase,
     private val getAllUsers: LoadUsersUseCase,
     private val loadAllConversations: LoadConversationsUseCase,
     private val retrieveMessages: RetrieveMessagesUseCase,
     private val sendMessage: SendTextMessageUseCase,
     private val getInitialChatRoomInformation: GetInitialChatRoomInformation,
-    private val getUserData: GetUserDataUseCase,
     private val fetchChatsUseCase: FetchChatsUseCase,
     private val sendTextMessageUseCase: SendTextMessageUseCase,
     private val sendImageMessageUseCase: SendImageMessageUseCase,
 ) : ViewModel() {
 
-    private val _userId = MutableStateFlow(getUserData()?.uid.orEmpty())
+    private val _userId = MutableStateFlow("")
     val userId: StateFlow<String> = _userId
+
+    private val _chats = MutableStateFlow<Resource<List<Chat>>>(Resource.Loading)
+    val chats: StateFlow<Resource<List<Chat>>> = _chats
+
 
     private val _users = MutableStateFlow<List<User>>(emptyList())
     val users: StateFlow<List<User>> = _users
@@ -57,13 +62,10 @@ class ChatViewModel @Inject constructor(
 
     private lateinit var chatRoom: ChatRoom
 
-    private val _chats = MutableStateFlow<List<Chat>>(emptyList())
-    val chats: StateFlow<List<Chat>> = _chats
-
 
     init {
         observeUserId()
-        loadUsers()
+        fetchChats()
     }
 
     private fun observeUserId() {
@@ -72,19 +74,18 @@ class ChatViewModel @Inject constructor(
         }
     }
 
+    fun fetchChats() {
+        viewModelScope.launch {
+            fetchChatsUseCase(userId.value).collect { chats ->
+                _chats.value = chats
+            }
+        }
+    }
+
     private fun loadUsers() {
         viewModelScope.launch {
             _users.value = getAllUsers()
         }
-    }
-
-
-    fun fetchChats() {
-//        viewModelScope.launch {
-//            fetchChatsUseCase(userId.value).collect { chats ->
-//                _chats.value = chats
-//            }
-//        }
     }
 
     /**
@@ -104,13 +105,6 @@ class ChatViewModel @Inject constructor(
 //            }
 //        }
 //    }
-
-    /**
-     * Get all messages from the firestore collection.
-     */
-    fun getUserId(): String? {
-        return getUserData()?.uid
-    }
 
     /**
      * Get initial chat room information.
@@ -180,7 +174,6 @@ class ChatViewModel @Inject constructor(
             sendImageMessageUseCase(chatId, senderId, uri)
         }
     }
-
 
 
     fun searchUsers(query: String) {

@@ -1,10 +1,10 @@
 package com.artofelectronic.nexchat.domain.usecases
 
-import com.artofelectronic.nexchat.data.datasource.remote.FirebaseDataSource
+import com.google.firebase.auth.FirebaseAuth
 import javax.inject.Inject
 
 class GetUserDataUseCase @Inject constructor(
-    private val firebaseDataSource: FirebaseDataSource
+    private val firebaseAuth: FirebaseAuth
 ) {
-    operator fun invoke() = firebaseDataSource.getCurrentUser()
+    operator fun invoke() = firebaseAuth.currentUser
 }

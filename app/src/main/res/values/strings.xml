@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">NexChat</string>
-    <string name="facebook_app_id">YOUR_FACEBOOK_APP_ID</string>
-    <string name="facebook_client_token">YOUR_CLIENT_TOKEN</string>
+    <string name="facebook_app_id">1232385814820611</string>
+    <string name="facebook_client_token">f4672efa7ec255ae0cd5bde87bcfed5a</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="chats">Conversations</string>
     <string name="no_conversations_found">No conversations found.</string>

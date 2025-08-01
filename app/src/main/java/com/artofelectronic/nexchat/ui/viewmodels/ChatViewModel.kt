@@ -11,8 +11,6 @@ import com.artofelectronic.nexchat.domain.usecases.users.FetchUserProfileUseCase
 import com.artofelectronic.nexchat.domain.usecases.chats.GetMessagesUseCase
 import com.artofelectronic.nexchat.domain.usecases.chats.ObserveChatsUseCase
 import com.artofelectronic.nexchat.domain.usecases.chats.ObserveMessagesUseCase
-import com.artofelectronic.nexchat.domain.usecases.chats.RefreshChatsUseCase
-import com.artofelectronic.nexchat.domain.usecases.chats.RetryPendingUpdatesUseCase
 import com.artofelectronic.nexchat.domain.usecases.chats.SendMessageUseCase
 import com.artofelectronic.nexchat.domain.usecases.chats.ChatRealtimeSyncUseCase
 import com.artofelectronic.nexchat.utils.Resource
@@ -30,8 +28,6 @@ import javax.inject.Inject
 class ChatViewModel @Inject constructor(
     private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
     private val observeChatsUseCase: ObserveChatsUseCase,
-    private val refreshChatsUseCase: RefreshChatsUseCase,
-    private val retryPendingUpdatesUseCase: RetryPendingUpdatesUseCase,
     private val fetchChatsOnceIfNeededUseCase: FetchChatsOnceIfNeededUseCase,
     private val chatRealtimeSyncUseCase: ChatRealtimeSyncUseCase,
     private val observeMessagesUseCase: ObserveMessagesUseCase,
@@ -71,6 +67,7 @@ class ChatViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 if (userId.isNullOrEmpty()) {
+                    _chatList.value = Resource.Error(Throwable("User Id is not valid!"))
                     return@launch
                 }
 
@@ -85,30 +82,14 @@ class ChatViewModel @Inject constructor(
         }
     }
 
-    fun refreshChats(userId: String?) {
-        viewModelScope.launch {
-            try {
-                if (userId.isNullOrEmpty()) return@launch
-
-                val currentData = (_chatList.value as? Resource.Success)?.data
-                _chatList.value = Resource.Loading(currentData)
-                refreshChatsUseCase(userId)
-            } catch (e: Exception) {
-                _chatList.value = Resource.Error(e)
-            }
-        }
-    }
-
-    fun retryPending() {
-        viewModelScope.launch {
-            retryPendingUpdatesUseCase()
-        }
-    }
-
     fun fetchUserProfile(userId: String) {
         viewModelScope.launch {
             try {
-                if (userId.isEmpty()) return@launch
+                if (userId.isEmpty()) {
+                    _chatList.value = Resource.Error(Throwable("User Id is not valid!"))
+                    return@launch
+                }
+
                 _userProfile.value = fetchUserProfileUseCase(userId)
             } catch (_: Exception) {
                 _userProfile.value = null

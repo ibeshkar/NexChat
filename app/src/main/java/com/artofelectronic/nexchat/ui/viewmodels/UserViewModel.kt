@@ -44,7 +44,7 @@ class UserViewModel @Inject constructor(
         observeUsers()
     }
 
-    private fun observeUsers() {
+    fun observeUsers() {
         viewModelScope.launch {
             fetchUsersUseCase()
             usersListener = userChangeListenerUseCase()
@@ -54,22 +54,11 @@ class UserViewModel @Inject constructor(
         }
     }
 
-    fun syncUsers() {
-        viewModelScope.launch {
-            val currentData = (_userList.value as? Resource.Success)?.data
-            _userList.value = Resource.Loading(currentData)
-            try {
-                userChangeListenerUseCase()
-            } catch (e: Exception) {
-                _userList.value = Resource.Error(e, currentData)
-            }
-        }
-    }
-
     fun onUserSelected(currentUserId: String?, selectedUserId: String) {
         viewModelScope.launch {
             try {
                 if (currentUserId.isNullOrBlank()) {
+                    _userList.value = Resource.Error(Throwable("User Id is not valid!"))
                     return@launch
                 }
                 val chat = createOrContinueChatUseCase(currentUserId, selectedUserId)

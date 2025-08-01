@@ -109,6 +109,7 @@ dependencies {
     androidTestUtil(libs.androidx.orchestrator)
     testImplementation(libs.kotlinx.coroutines.test)
     testImplementation(libs.androidx.core.testing)
+    testImplementation(libs.turbine)
 
     // Material design
     implementation(libs.androidx.material.icons.extended)

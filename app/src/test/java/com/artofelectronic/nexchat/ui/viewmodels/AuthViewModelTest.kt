@@ -18,7 +18,6 @@ import com.artofelectronic.nexchat.utils.VALID_EMAIL
 import com.artofelectronic.nexchat.utils.VALID_PASSWORD
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseUser
-import io.mockk.MockKAnnotations
 import io.mockk.Runs
 import io.mockk.coEvery
 import io.mockk.coVerify
@@ -53,8 +52,6 @@ class AuthViewModelTest {
 
     @Before
     fun setup() {
-        MockKAnnotations.init(this, relaxed = true)
-
         checkUserLoggedInUseCase = mockk()
         signupWithEmailUseCase = mockk()
         signInWithGoogleUseCase = mockk()

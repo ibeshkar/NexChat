@@ -5,6 +5,7 @@ import androidx.credentials.CredentialManager
 import androidx.credentials.CustomCredential
 import androidx.credentials.GetCredentialRequest
 import com.artofelectronic.nexchat.BuildConfig
+import com.artofelectronic.nexchat.R
 import com.artofelectronic.nexchat.core.NexChatApp
 import com.artofelectronic.nexchat.domain.repository.AuthRepository
 import com.google.android.gms.tasks.Tasks
@@ -24,6 +25,8 @@ class FirebaseAuthRepository @Inject constructor(
     private val firebaseAuth: FirebaseAuth
 ) : AuthRepository {
 
+    override fun getCurrentUserId(): String? = firebaseAuth.currentUser?.uid
+
     override suspend fun isLoggedIn(): Boolean {
         val currentUser = firebaseAuth.currentUser ?: return false
 
@@ -35,7 +38,7 @@ class FirebaseAuthRepository @Inject constructor(
                 firebaseAuth.signOut()
             }
             false
-        } catch (e: InterruptedException) {
+        } catch (_: InterruptedException) {
             Thread.currentThread().interrupt()
             false
         }
@@ -76,10 +79,10 @@ class FirebaseAuthRepository @Inject constructor(
                 val idTokenCredential = GoogleAuthProvider.getCredential(idToken, null)
                 return firebaseAuth.signInWithCredential(idTokenCredential).await()
             } else {
-                throw IllegalStateException("Google ID Token is blank.")
+                throw IllegalStateException(context.getString(R.string.google_id_token_is_blank_message))
             }
         } else {
-            throw IllegalStateException("Invalid credential type returned.")
+            throw IllegalStateException(context.getString(R.string.invalid_credential_type_returned_message))
         }
     }
 
@@ -97,7 +100,8 @@ class FirebaseAuthRepository @Inject constructor(
             pendingResultTask.await()
         } else {
             // Start the sign-in process
-            firebaseAuth.startActivityForSignInWithProvider(activity, twitterProvider.build()).await()
+            firebaseAuth.startActivityForSignInWithProvider(activity, twitterProvider.build())
+                .await()
         }
     }
 

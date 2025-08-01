@@ -25,4 +25,10 @@ object DatabaseModule {
     @Provides
     fun provideMessageDao(appDatabase: AppDatabase) = appDatabase.messageDao()
 
+    @Provides
+    fun provideUserDao(appDatabase: AppDatabase) = appDatabase.userDao()
+
+    @Provides
+    fun providePendingUpdateDao(appDatabase: AppDatabase) = appDatabase.pendingUpdateDao()
+
 }

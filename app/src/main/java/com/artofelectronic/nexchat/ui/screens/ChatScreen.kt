@@ -1,53 +1,44 @@
 package com.artofelectronic.nexchat.ui.screens
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.artofelectronic.nexchat.R
-import com.artofelectronic.nexchat.ui.components.ListOfMessages
-import com.artofelectronic.nexchat.ui.components.SendMessageBox
+import com.artofelectronic.nexchat.ui.components.ChatScreenContent
 import com.artofelectronic.nexchat.ui.viewmodels.ChatViewModel
+import com.artofelectronic.nexchat.utils.generateChatId
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChatScreen(
     chatId: String?,
     viewModel: ChatViewModel = hiltViewModel()
 ) {
-    val messages by viewModel.messages.collectAsStateWithLifecycle()
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.loadChatInformation(chatId.orEmpty())
+    val messages by viewModel.messages.collectAsState()
+    val currentUserId by viewModel.currentUserId.collectAsState()
+    val receiverId = chatId?.split("_")?.find { it != currentUserId }.orEmpty()
+    val chatId = chatId ?: generateChatId(currentUserId, receiverId)
+
+
+    LaunchedEffect(chatId) {
+        viewModel.observeMessages(chatId.orEmpty())
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.chat_with, uiState.name)
-                    )
-                }
-            )
-        },
-        bottomBar = {
-            SendMessageBox {
-                viewModel.sendTextMessage(
-                    chatId = chatId.orEmpty(),
-                    senderId = viewModel.userId.value,
-                    text = it
-                )
-            }
-        }
-    ) { paddingValues ->
-        ListOfMessages(paddingValues, messages)
+    ChatScreenContent(
+        messages = messages,
+        currentUserId = currentUserId
+    ) { message ->
+        viewModel.sendMessage(
+            chatId = chatId.orEmpty(),
+            message = message,
+            senderId = currentUserId.orEmpty(),
+            receiverId = receiverId
+        )
     }
 }

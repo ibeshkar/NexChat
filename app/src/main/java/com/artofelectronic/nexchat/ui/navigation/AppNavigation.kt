@@ -1,5 +1,7 @@
 package com.artofelectronic.nexchat.ui.navigation
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -16,6 +18,7 @@ import com.artofelectronic.nexchat.ui.screens.SignupScreen
 import com.artofelectronic.nexchat.ui.screens.StartScreen
 import com.artofelectronic.nexchat.ui.screens.UserListScreen
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavigation(
     modifier: Modifier = Modifier,
@@ -39,7 +42,7 @@ fun AppNavigation(
         // Main Screens
         composable(Screens.Chats.route) { ChatListScreen(navController) }
         composable(Screens.Users.route) { UserListScreen(navController) }
-        composable(Screens.Profile.route) { ProfileScreen(navController) }
+        composable(Screens.Profile.route) { ProfileScreen() }
 
 
         // Chat Detail Screen

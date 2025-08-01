@@ -1,189 +1,147 @@
 package com.artofelectronic.nexchat.ui.viewmodels
 
-import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.artofelectronic.nexchat.data.models.ChatRoom
-import com.artofelectronic.nexchat.data.models.Chat
-import com.artofelectronic.nexchat.data.models.Message
-import com.artofelectronic.nexchat.data.models.User
-import com.artofelectronic.nexchat.domain.usecases.FetchChatsUseCase
-import com.artofelectronic.nexchat.domain.usecases.GetInitialChatRoomInformation
-import com.artofelectronic.nexchat.domain.usecases.GetUserDataUseCase
-import com.artofelectronic.nexchat.domain.usecases.LoadConversationsUseCase
-import com.artofelectronic.nexchat.domain.usecases.LoadUsersUseCase
-import com.artofelectronic.nexchat.domain.usecases.RetrieveMessagesUseCase
-import com.artofelectronic.nexchat.domain.usecases.SendImageMessageUseCase
-import com.artofelectronic.nexchat.domain.usecases.SendTextMessageUseCase
+import com.artofelectronic.nexchat.domain.model.Chat
+import com.artofelectronic.nexchat.domain.model.Message
+import com.artofelectronic.nexchat.domain.model.User
+import com.artofelectronic.nexchat.domain.usecases.auth.GetCurrentUserIdUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.FetchChatsOnceIfNeededUseCase
+import com.artofelectronic.nexchat.domain.usecases.users.FetchUserProfileUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.GetMessagesUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.ObserveChatsUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.ObserveMessagesUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.RefreshChatsUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.RetryPendingUpdatesUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.SendMessageUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.ChatRealtimeSyncUseCase
 import com.artofelectronic.nexchat.utils.Resource
+import com.google.firebase.Timestamp
+import com.google.firebase.firestore.ListenerRegistration
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.UUID
 import javax.inject.Inject
 
 @HiltViewModel
 class ChatViewModel @Inject constructor(
-    private val getUserData: GetUserDataUseCase,
-    private val getAllUsers: LoadUsersUseCase,
-    private val loadAllConversations: LoadConversationsUseCase,
-    private val retrieveMessages: RetrieveMessagesUseCase,
-    private val sendMessage: SendTextMessageUseCase,
-    private val getInitialChatRoomInformation: GetInitialChatRoomInformation,
-    private val fetchChatsUseCase: FetchChatsUseCase,
-    private val sendTextMessageUseCase: SendTextMessageUseCase,
-    private val sendImageMessageUseCase: SendImageMessageUseCase,
+    private val getCurrentUserIdUseCase: GetCurrentUserIdUseCase,
+    private val observeChatsUseCase: ObserveChatsUseCase,
+    private val refreshChatsUseCase: RefreshChatsUseCase,
+    private val retryPendingUpdatesUseCase: RetryPendingUpdatesUseCase,
+    private val fetchChatsOnceIfNeededUseCase: FetchChatsOnceIfNeededUseCase,
+    private val chatRealtimeSyncUseCase: ChatRealtimeSyncUseCase,
+    private val observeMessagesUseCase: ObserveMessagesUseCase,
+    private val sendMessageUseCase: SendMessageUseCase,
+    private val getMessagesUseCase: GetMessagesUseCase,
+    private val fetchUserProfileUseCase: FetchUserProfileUseCase
 ) : ViewModel() {
 
-    private val _userId = MutableStateFlow("")
-    val userId: StateFlow<String> = _userId
+    private val _chatList = MutableStateFlow<Resource<List<Chat>>>(Resource.Loading())
+    val chatList: StateFlow<Resource<List<Chat>>> = _chatList
 
-    private val _chats = MutableStateFlow<Resource<List<Chat>>>(Resource.Loading)
-    val chats: StateFlow<Resource<List<Chat>>> = _chats
+    private val _currentUserId = MutableStateFlow<String?>(null)
+    val currentUserId: StateFlow<String?> = _currentUserId
 
-
-    private val _users = MutableStateFlow<List<User>>(emptyList())
-    val users: StateFlow<List<User>> = _users
-
-    private val _conversations = MutableStateFlow<List<Chat>>(emptyList())
-    val conversations: StateFlow<List<Chat>> = _conversations
+    private val _userProfile = MutableStateFlow<User?>(null)
+    val userProfile: StateFlow<User?> = _userProfile
 
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
     val messages: StateFlow<List<Message>> = _messages
 
-    private val _uiState = MutableStateFlow(ChatRoom())
-    val uiState: StateFlow<ChatRoom> = _uiState
+    private val _logoutState = MutableStateFlow(false)
+    val logoutState: StateFlow<Boolean> = _logoutState
 
-    private var messageCollectionJob: Job? = null
-
-    private lateinit var chatRoom: ChatRoom
+    private var chatsListener: ListenerRegistration? = null
+    private var messageListener: ListenerRegistration? = null
 
 
     init {
-        observeUserId()
-        fetchChats()
+        getCurrentUserId()
     }
 
-    private fun observeUserId() {
+    private fun getCurrentUserId() {
+        _currentUserId.value = getCurrentUserIdUseCase()
+    }
+
+    fun observeChats(userId: String?) {
         viewModelScope.launch {
-            _userId.value = getUserData()?.uid.orEmpty()
-        }
-    }
-
-    fun fetchChats() {
-        viewModelScope.launch {
-            fetchChatsUseCase(userId.value).collect { chats ->
-                _chats.value = chats
-            }
-        }
-    }
-
-    private fun loadUsers() {
-        viewModelScope.launch {
-            _users.value = getAllUsers()
-        }
-    }
-
-    /**
-     * Get all conversations from the firestore collection.
-     */
-//    fun loadConversations(userId: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            try {
-//                loadAllConversations(userId).addOnSuccessListener { querySnapshot ->
-//                    val chats = querySnapshot.documents.mapNotNull { document ->
-//                        document.toObject(Chat::class.java)
-//                    }
-//                    _conversations.value = chats
-//                }
-//            } catch (e: Exception) {
-//                e.printStackTrace()
-//            }
-//        }
-//    }
-
-    /**
-     * Get initial chat room information.
-     */
-    fun loadChatInformation(chatRoomId: String) {
-        messageCollectionJob = viewModelScope.launch(Dispatchers.IO) {
             try {
-                chatRoom = getInitialChatRoomInformation(chatRoomId)
-                withContext(Dispatchers.Main) {
-                    _uiState.value = chatRoom
-                    _messages.value = chatRoom.messages
-                    updateMessages()
+                if (userId.isNullOrEmpty()) {
+                    return@launch
+                }
+
+                fetchChatsOnceIfNeededUseCase(userId)
+                chatsListener = chatRealtimeSyncUseCase(userId)
+                observeChatsUseCase().collectLatest { chats ->
+                    _chatList.value = Resource.Success(chats)
                 }
             } catch (e: Exception) {
-                e.printStackTrace()
+                _chatList.value = Resource.Error(e)
             }
         }
     }
 
-
-    private fun updateMessages() {
-        messageCollectionJob = viewModelScope.launch(Dispatchers.IO) {
+    fun refreshChats(userId: String?) {
+        viewModelScope.launch {
             try {
-                getUserData()?.uid?.let {
-                    retrieveMessages(chatId = chatRoom.id)
-                        .collect { message ->
-                            withContext(Dispatchers.Main) {
-//                                _messages.value += message
-                            }
-                        }
-                }
-            } catch (e: Throwable) {
-                e.printStackTrace()
+                if (userId.isNullOrEmpty()) return@launch
+
+                val currentData = (_chatList.value as? Resource.Success)?.data
+                _chatList.value = Resource.Loading(currentData)
+                refreshChatsUseCase(userId)
+            } catch (e: Exception) {
+                _chatList.value = Resource.Error(e)
             }
         }
     }
 
-//    fun onSendMessage(messageText: String) {
-//        viewModelScope.launch(Dispatchers.IO) {
-//            val user = getUserData() ?: return@launch
-//            val message = Message(
-//                senderId = user.uid,
-//                senderAvatar = user.photoUrl?.path.orEmpty(),
-//                senderName = user.displayName.orEmpty(),
-//                isMine = true,
-//                content = Content.TextMessage(messageText)
-//            )
-//            sendMessage(chatId = chatRoom.id, message = message)
-//        }
-//    }
-
-    fun sendTextMessage(chatId: String, senderId: String, text: String) {
-        val message = Message(
-            id = UUID.randomUUID().toString(),
-            chatId = chatId,
-            senderId = senderId,
-            text = text,
-            timestamp = System.currentTimeMillis()
-        )
+    fun retryPending() {
         viewModelScope.launch {
-            sendTextMessageUseCase(chatId, message)
+            retryPendingUpdatesUseCase()
         }
     }
 
-    fun sendImageMessage(chatId: String, senderId: String, uri: Uri) {
+    fun fetchUserProfile(userId: String) {
         viewModelScope.launch {
-            sendImageMessageUseCase(chatId, senderId, uri)
+            try {
+                if (userId.isEmpty()) return@launch
+                _userProfile.value = fetchUserProfileUseCase(userId)
+            } catch (_: Exception) {
+                _userProfile.value = null
+            }
         }
     }
 
-
-    fun searchUsers(query: String) {
+    fun observeMessages(chatId: String) {
         viewModelScope.launch {
-            _users.value = getAllUsers().filter { it.name.contains(query, ignoreCase = true) }
+            messageListener = getMessagesUseCase(chatId)
+            observeMessagesUseCase(chatId).collectLatest { messages ->
+                _messages.value = messages
+            }
         }
     }
 
+    fun sendMessage(chatId: String, message: String, senderId: String, receiverId: String) {
+        viewModelScope.launch {
+            val message = Message(
+                messageId = UUID.randomUUID().toString(),
+                chatId = chatId,
+                senderId = senderId,
+                receiverId = receiverId,
+                text = message,
+                timestamp = Timestamp.now()
+            )
+            sendMessageUseCase(message)
+        }
+    }
 
     override fun onCleared() {
-        messageCollectionJob?.cancel()
+        super.onCleared()
+        chatsListener?.remove()
+        messageListener?.remove()
     }
 }

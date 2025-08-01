@@ -1,0 +1,56 @@
+{
+  "project_info": {
+    "project_number": "881102097005",
+    "firebase_url": "https://nexchat-de3ae-default-rtdb.firebaseio.com",
+    "project_id": "nexchat-de3ae",
+    "storage_bucket": "nexchat-de3ae.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:881102097005:android:9d3cfc835ef3ac711a8d64",
+        "android_client_info": {
+          "package_name": "com.artofelectronic.nexchat"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "881102097005-g0cbucccr9e5338slk0vq8o768kj7mip.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.artofelectronic.nexchat",
+            "certificate_hash": "719400684bef50fb14fd6e64d713aad004873ff3"
+          }
+        },
+        {
+          "client_id": "881102097005-mahm9pvqc2hmlgnf86esock58rs93fqk.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.artofelectronic.nexchat",
+            "certificate_hash": "b820ee8bf3837a906ed71875d33733d32b37b9fe"
+          }
+        },
+        {
+          "client_id": "881102097005-e13o8829e356en8epbk8sros1rkcfu1b.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBLT4WBlCMxyKov9nE3depUTdglRFmDpUQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "881102097005-5dvq00cri7lvqqashn44ct241glhlkm7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

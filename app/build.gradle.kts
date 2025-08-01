@@ -29,11 +29,9 @@ android {
         versionCode = 1
         versionName = "1.0.0"
 
-        testInstrumentationRunner = "com.artofelectronic.nexchat.ui.HiltTestRunner"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        val webClientId: String =
-            localProperties.getProperty("Firebase_Web_Client_ID") ?: "default_key"
-        buildConfigField("String", "Firebase_Web_Client_ID", "\"$webClientId\"")
+        buildConfigField("String", "Firebase_Web_Client_ID", "\"${property("Firebase_Web_Client_ID")}\"")
     }
 
     buildTypes {

@@ -2,19 +2,25 @@ package com.artofelectronic.nexchat.di
 
 import com.artofelectronic.nexchat.domain.repository.AuthRepository
 import com.artofelectronic.nexchat.domain.repository.ChatRepository
-import com.artofelectronic.nexchat.domain.repository.IChatRoomRepository
-import com.artofelectronic.nexchat.domain.repository.MessageRepository
 import com.artofelectronic.nexchat.domain.repository.UserRepository
-import com.artofelectronic.nexchat.domain.usecases.CheckUserLoggedInUseCase
-import com.artofelectronic.nexchat.domain.usecases.CreateUserInFirestoreUseCase
-import com.artofelectronic.nexchat.domain.usecases.GetInitialChatRoomInformation
-import com.artofelectronic.nexchat.domain.usecases.LoadConversationsUseCase
-import com.artofelectronic.nexchat.domain.usecases.LoadUsersUseCase
-import com.artofelectronic.nexchat.domain.usecases.RetrieveMessagesUseCase
-import com.artofelectronic.nexchat.domain.usecases.SendTextMessageUseCase
-import com.artofelectronic.nexchat.domain.usecases.SendPasswordResetEmailUseCase
-import com.artofelectronic.nexchat.domain.usecases.SignInWithEmailUseCase
-import com.artofelectronic.nexchat.domain.usecases.SignupWithEmailUseCase
+import com.artofelectronic.nexchat.domain.usecases.auth.GetCurrentUserIdUseCase
+import com.artofelectronic.nexchat.domain.usecases.users.CheckUserLoggedInUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.FetchChatsOnceIfNeededUseCase
+import com.artofelectronic.nexchat.domain.usecases.users.FetchUserProfileUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.GetMessagesUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.ObserveChatsUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.ObserveMessagesUseCase
+import com.artofelectronic.nexchat.domain.usecases.users.ObserveUsersUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.RefreshChatsUseCase
+import com.artofelectronic.nexchat.domain.usecases.users.UserChangeListenerUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.RetryPendingUpdatesUseCase
+import com.artofelectronic.nexchat.domain.usecases.auth.SendPasswordResetEmailUseCase
+import com.artofelectronic.nexchat.domain.usecases.auth.SignInWithEmailUseCase
+import com.artofelectronic.nexchat.domain.usecases.auth.SignupWithEmailUseCase
+import com.artofelectronic.nexchat.domain.usecases.chats.CreateOrContinueChatUseCase
+import com.artofelectronic.nexchat.domain.usecases.users.FetchUsersUseCase
+import com.artofelectronic.nexchat.domain.usecases.users.SignOutUseCase
+import com.artofelectronic.nexchat.domain.usecases.users.UpdateAvatarUrlUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -49,32 +55,73 @@ object UseCaseModule {
     }
 
     @Provides
-    fun provideLoadUsersUseCase(repository: UserRepository): LoadUsersUseCase {
-        return LoadUsersUseCase(repository)
+    fun provideObserveChatsUseCase(repository: ChatRepository): ObserveChatsUseCase {
+        return ObserveChatsUseCase(repository)
     }
 
     @Provides
-    fun provideCreateUserInFirestoreUseCase(repository: UserRepository): CreateUserInFirestoreUseCase {
-        return CreateUserInFirestoreUseCase(repository)
+    fun provideFetchChatsOnceIfNeededUseCase(repository: ChatRepository): FetchChatsOnceIfNeededUseCase {
+        return FetchChatsOnceIfNeededUseCase(repository)
     }
 
     @Provides
-    fun provideLoadConversationsUseCase(repository: ChatRepository): LoadConversationsUseCase {
-        return LoadConversationsUseCase(repository)
+    fun provideRefreshChatsUseCase(repository: ChatRepository): RefreshChatsUseCase {
+        return RefreshChatsUseCase(repository)
     }
 
     @Provides
-    fun provideRetrieveMessagesUseCase(repository: MessageRepository): RetrieveMessagesUseCase {
-        return RetrieveMessagesUseCase(repository)
+    fun provideRetryPendingUpdatesUseCase(repository: ChatRepository): RetryPendingUpdatesUseCase {
+        return RetryPendingUpdatesUseCase(repository)
     }
 
     @Provides
-    fun provideSendMessageUseCase(repository: MessageRepository): SendTextMessageUseCase {
-        return SendTextMessageUseCase(repository)
+    fun provideObserveUsersUseCase(repository: UserRepository): ObserveUsersUseCase {
+        return ObserveUsersUseCase(repository)
     }
 
     @Provides
-    fun provideGetInitialChatRoomInformation(repository: IChatRoomRepository): GetInitialChatRoomInformation {
-        return GetInitialChatRoomInformation(repository)
+    fun provideRefreshUsersUseCase(repository: UserRepository): UserChangeListenerUseCase {
+        return UserChangeListenerUseCase(repository)
     }
+
+    @Provides
+    fun provideStartOrGetChatUseCase(repository: ChatRepository): CreateOrContinueChatUseCase {
+        return CreateOrContinueChatUseCase(repository)
+    }
+
+    @Provides
+    fun provideObserveMessagesUseCase(repository: ChatRepository): ObserveMessagesUseCase {
+        return ObserveMessagesUseCase(repository)
+    }
+
+    @Provides
+    fun provideFetchUserProfileUseCase(repository: UserRepository): FetchUserProfileUseCase {
+        return FetchUserProfileUseCase(repository)
+    }
+
+    @Provides
+    fun provideGetMessagesUseCase(repository: ChatRepository): GetMessagesUseCase {
+        return GetMessagesUseCase(repository)
+    }
+
+    @Provides
+    fun provideFetchUsersUseCase(repository: UserRepository): FetchUsersUseCase {
+        return FetchUsersUseCase(repository)
+    }
+
+    @Provides
+    fun provideUpdateAvatarUrlUseCase(repository: UserRepository): UpdateAvatarUrlUseCase {
+        return UpdateAvatarUrlUseCase(repository)
+    }
+
+    @Provides
+    fun provideGetCurrentUserIdUseCase(repository: AuthRepository): GetCurrentUserIdUseCase {
+        return GetCurrentUserIdUseCase(repository)
+    }
+
+    @Provides
+    fun provideSignOutUseCase(repository: UserRepository): SignOutUseCase {
+        return SignOutUseCase(repository)
+    }
+
 }

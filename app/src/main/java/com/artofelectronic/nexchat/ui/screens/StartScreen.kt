@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -21,11 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.artofelectronic.nexchat.R
-import com.artofelectronic.nexchat.ui.theme.AlmostWhite
-import com.artofelectronic.nexchat.ui.theme.DarkerGreen
-import com.artofelectronic.nexchat.ui.theme.LightMintGreen
-import com.artofelectronic.nexchat.utils.navigateToSignIn
-import com.artofelectronic.nexchat.utils.navigateToSignup
+import com.artofelectronic.nexchat.utils.NavigationUtil.navigateToSignIn
+import com.artofelectronic.nexchat.utils.NavigationUtil.navigateToSignup
 
 @Composable
 fun StartScreen(navController: NavController) {
@@ -33,20 +31,9 @@ fun StartScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(LightMintGreen)
+            .background(MaterialTheme.colorScheme.background)
             .padding(horizontal = 32.dp)
     ) {
-
-        Spacer(modifier = Modifier.height(100.dp))
-
-        Text(
-            text = "Welcome to NEXChat",
-            color = DarkerGreen,
-            fontWeight = FontWeight.Bold,
-            fontSize = 28.sp,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center
-        )
 
         Spacer(modifier = Modifier.height(100.dp))
 
@@ -58,10 +45,21 @@ fun StartScreen(navController: NavController) {
                 .size(200.dp)
         )
 
+        Spacer(modifier = Modifier.height(100.dp))
+
+        Text(
+            text = "Welcome to NEXChat",
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Bold,
+            fontSize = 32.sp,
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.Center
+        )
+
         Text(
             text = "Connect with friends and family anytime, anywhere.",
-            color = DarkerGreen,
-            fontSize = 16.sp,
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 14.sp,
             modifier = Modifier.fillMaxWidth(),
             textAlign = TextAlign.Center
         )
@@ -71,12 +69,12 @@ fun StartScreen(navController: NavController) {
         )
 
         Button(
-            onClick = {navController.navigateToSignIn()},
+            onClick = { navController.navigateToSignIn() },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(60.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = DarkerGreen
+                containerColor = MaterialTheme.colorScheme.primary
             )
         ) {
             Text(
@@ -94,16 +92,16 @@ fun StartScreen(navController: NavController) {
             onClick = { navController.navigateToSignup() },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(50.dp),
+                .height(60.dp),
             colors = ButtonDefaults.buttonColors(
-                containerColor = AlmostWhite
+                containerColor = MaterialTheme.colorScheme.onPrimary
             )
         ) {
             Text(
                 text = "Sign Up",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
-                color = DarkerGreen
+                color = MaterialTheme.colorScheme.primary
             )
         }
 

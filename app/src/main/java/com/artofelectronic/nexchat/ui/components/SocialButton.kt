@@ -10,10 +10,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import com.artofelectronic.nexchat.R
-import com.artofelectronic.nexchat.ui.theme.DarkerGreen
 
 @Composable
 fun SocialButton(provider: AuthProvider, onClick: () -> Unit) {
@@ -29,10 +29,10 @@ fun SocialButton(provider: AuthProvider, onClick: () -> Unit) {
 
     Button(
         onClick = onClickListener,
-        modifier = Modifier.size(48.dp),
+        modifier = Modifier.size(60.dp),
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = DarkerGreen
+            containerColor = MaterialTheme.colorScheme.primary
         ),
         elevation = ButtonDefaults.elevatedButtonElevation(
             defaultElevation = 4.dp

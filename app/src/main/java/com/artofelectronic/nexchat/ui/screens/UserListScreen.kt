@@ -1,77 +1,63 @@
 package com.artofelectronic.nexchat.ui.screens
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import coil.compose.AsyncImage
-import com.artofelectronic.nexchat.ui.viewmodels.ChatViewModel
-import com.artofelectronic.nexchat.utils.navigateToChat
+import com.artofelectronic.nexchat.R
+import com.artofelectronic.nexchat.ui.components.FullScreenLoadingDialog
+import com.artofelectronic.nexchat.ui.components.RetryLayout
+import com.artofelectronic.nexchat.ui.components.UserListItem
+import com.artofelectronic.nexchat.ui.viewmodels.UserViewModel
+import com.artofelectronic.nexchat.utils.NavigationUtil.navigateToChat
+import com.artofelectronic.nexchat.utils.Resource
+import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun UserListScreen(
     navController: NavController,
-    viewModel: ChatViewModel = hiltViewModel()
+    viewModel: UserViewModel = hiltViewModel()
 ) {
-    val search = remember { mutableStateOf("") }
-    val users by viewModel.users.collectAsState()
-    val currentUserId by viewModel.userId.collectAsState()
 
-    Column {
-        OutlinedTextField(
-            value = search.value,
-            onValueChange = {
-                search.value = it
-                viewModel.searchUsers(it)
-            },
-            label = { Text("Search user") }
-        )
+    val state by viewModel.userList.collectAsState()
+    val currentUserId by viewModel.currentUserId.collectAsState()
 
-        LazyColumn {
-            items(users.filter { it.id != currentUserId }) { user ->
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            navController.navigateToChat(user.id)
-                        }
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    AsyncImage(
-                        model = user.avatar,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                    )
-                    Spacer(Modifier.width(12.dp))
-                    Column {
-                        Text(user.name, fontWeight = FontWeight.Bold)
-                        Text(user.email, fontSize = 12.sp, color = Color.Gray)
+    LaunchedEffect(Unit) {
+        viewModel.navigation.collectLatest { chatId ->
+            navController.navigateToChat(chatId)
+        }
+    }
+
+    when (val result = state) {
+        is Resource.Loading -> {
+            FullScreenLoadingDialog()
+        }
+
+        is Resource.Error -> {
+            RetryLayout(
+                errorMessage = result.throwable.message ?: stringResource(R.string.unknown_error),
+                onClick = viewModel.syncUsers()
+            )
+        }
+
+        is Resource.Success -> {
+            if (result.data.isEmpty()) {
+                RetryLayout(
+                    errorMessage = stringResource(R.string.no_users_found),
+                    onClick = viewModel.syncUsers()
+                )
+                return
+            }
+
+            LazyColumn {
+                items(result.data.filter { it.userId != currentUserId }) { user ->
+                    UserListItem(user) {
+                        viewModel.onUserSelected(currentUserId, user.userId)
                     }
                 }
             }

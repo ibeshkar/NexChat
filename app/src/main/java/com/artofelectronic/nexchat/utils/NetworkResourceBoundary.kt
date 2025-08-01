@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.*
 abstract class NetworkResourceBoundary<ResultType, RequestType> {
 
     fun asFlow(): Flow<Resource<ResultType>> = flow {
-        emit(Resource.Loading)
+        emit(Resource.Loading())
 
         val local = loadFromDb()
         if (local != null) {
@@ -18,7 +18,7 @@ abstract class NetworkResourceBoundary<ResultType, RequestType> {
             emit(Resource.Success(remote))
         } catch (e: Exception) {
             if (local == null) {
-                emit(Resource.Error(e.localizedMessage ?: "Network error"))
+                emit(Resource.Error(e))
             }
         }
     }

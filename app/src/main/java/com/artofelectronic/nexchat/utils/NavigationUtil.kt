@@ -3,28 +3,43 @@ package com.artofelectronic.nexchat.utils
 import androidx.navigation.NavController
 import com.artofelectronic.nexchat.ui.navigation.Screens
 
-fun NavController.navigateToSignup() {
-    this.navigate(Screens.SignUp.route) {
-        popUpTo(Screens.SignIn.route) { inclusive = true }
+object NavigationUtil {
+
+    fun NavController.navigateToStart() {
+        this.navigate(Screens.Start.route) {
+            popUpTo(0) { inclusive = true }
+            launchSingleTop = true
+        }
     }
-}
 
-fun NavController.navigateToSignIn() {
-    this.navigate(Screens.SignIn.route)
-}
+    fun NavController.navigateToSignup() {
+        this.navigate(Screens.SignUp.route) {
+            popUpTo(Screens.SignIn.route) { inclusive = true }
+        }
+    }
 
-fun NavController.navigateToForgotPassword() {
-    this.navigate(Screens.ForgotPassword.route)
-}
+    fun NavController.navigateToSignIn() {
+        this.navigate(Screens.SignIn.route)
+    }
 
-fun NavController.navigateToChats() {
-    this.navigate(Screens.Chats.route)
-}
+    fun NavController.navigateToForgotPassword() {
+        this.navigate(Screens.ForgotPassword.route)
+    }
 
-fun NavController.navigateToChat(chatId: String) {
-    this.navigate(Screens.Chat.createRoute(chatId))
-}
+    fun NavController.navigateToChats() {
+        this.navigate(Screens.Chats.route) {
+            popUpTo(Screens.Start.route) { inclusive = true }
+        }
+    }
 
-fun NavController.navigateToUserList() {
-    this.navigate(Screens.Users.route)
+    fun NavController.navigateToChat(chatId: String) {
+        this.navigate(Screens.Chat.createRoute(chatId)) {
+            popUpTo(Screens.Chats.route) { inclusive = false }
+        }
+    }
+
+    fun NavController.navigateToUserList() {
+        this.navigate(Screens.Users.route)
+    }
+
 }

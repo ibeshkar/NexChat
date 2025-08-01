@@ -10,26 +10,32 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-private val DarkColorScheme = darkColorScheme(
-    primary = DeepGreen,
-    secondary = SoftGreen,
-    tertiary = LightMintGreen
+val LightColorScheme = lightColorScheme(
+    primary = BluePrimary,
+    secondary = GraySecondary,
+    background = BackgroundLight,
+    surface = SurfaceLight,
+    onPrimary = OnPrimaryText,
+    onSecondary = OnSecondaryTextLight,
+    tertiary = PurpleTertiary,
+    onTertiary = OnPurpleTertiary,
+    tertiaryContainer = PurpleTertiaryContainer,
+    onTertiaryContainer = OnPurpleTertiaryContainer,
+    error = ErrorRed
 )
 
-private val LightColorScheme = lightColorScheme(
-    primary = DeepGreen,
-    secondary = SoftGreen,
-    tertiary = LightMintGreen
-
-    /* Other default colors to override
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE),
-    onPrimary = Color.White,
-    onSecondary = Color.White,
-    onTertiary = Color.White,
-    onBackground = Color(0xFF1C1B1F),
-    onSurface = Color(0xFF1C1B1F),
-    */
+val DarkColorScheme = darkColorScheme(
+    primary = BluePrimary,
+    secondary = CharcoalSecondaryDark,
+    background = BackgroundDark,
+    surface = SurfaceDark,
+    onPrimary = OnPrimaryText,
+    onSecondary = OnSecondaryTextDark,
+    tertiary = PurpleTertiary,
+    onTertiary = OnPurpleTertiary,
+    tertiaryContainer = PurpleTertiaryContainer,
+    onTertiaryContainer = OnPurpleTertiaryContainer,
+    error = ErrorRedDark
 )
 
 @Composable

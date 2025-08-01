@@ -1,21 +1,25 @@
 package com.artofelectronic.nexchat.ui.screens
 
-import android.widget.Toast
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.artofelectronic.nexchat.R
 import com.artofelectronic.nexchat.ui.components.ChatListItem
 import com.artofelectronic.nexchat.ui.components.FullScreenLoadingDialog
+import com.artofelectronic.nexchat.ui.components.RetryLayout
 import com.artofelectronic.nexchat.ui.viewmodels.ChatViewModel
+import com.artofelectronic.nexchat.utils.NavigationUtil.navigateToChat
 import com.artofelectronic.nexchat.utils.Resource
-import com.artofelectronic.nexchat.utils.navigateToChat
 
 @Composable
 fun ChatListScreen(
@@ -23,36 +27,41 @@ fun ChatListScreen(
     viewModel: ChatViewModel = hiltViewModel()
 ) {
 
-    val userId by viewModel.userId.collectAsState()
-    val chats by viewModel.chats.collectAsState()
+    val chatState by viewModel.chatList.collectAsState()
+    val currentUserId by viewModel.currentUserId.collectAsState()
 
-    LaunchedEffect(userId) {
-        viewModel.fetchChats()
+    val otherUserId = remember { mutableStateOf("") }
+    val otherUser by viewModel.userProfile.collectAsState()
+
+    LaunchedEffect(currentUserId) {
+        viewModel.observeChats(currentUserId)
+        viewModel.fetchUserProfile(otherUserId.value)
     }
 
-    when (val state = chats) {
+    when (val state = chatState) {
         is Resource.Success -> {
-            LazyColumn {
+            LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(state.data) { chat ->
+                    otherUserId.value = chat.participants.firstOrNull { it != currentUserId }.orEmpty()
+
                     ChatListItem(
                         chat = chat,
-                        currentUserId = userId,
+                        otherUser = otherUser,
                         onChatClick = { navController.navigateToChat(chat.chatId) }
                     )
-
-                    HorizontalDivider()
                 }
             }
         }
 
         is Resource.Error -> {
-            Toast.makeText(LocalContext.current, state.message, Toast.LENGTH_LONG).show()
+            RetryLayout(
+                errorMessage = state.throwable.message ?: stringResource(R.string.unknown_error),
+                onClick = viewModel.refreshChats(currentUserId)
+            )
         }
 
         is Resource.Loading -> {
             FullScreenLoadingDialog()
         }
     }
-
-
 }

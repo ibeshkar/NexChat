@@ -1,10 +1,19 @@
 package com.artofelectronic.nexchat.domain.repository
 
-import com.artofelectronic.nexchat.data.models.Chat
-import com.artofelectronic.nexchat.utils.Resource
+import com.artofelectronic.nexchat.domain.model.Chat
+import com.artofelectronic.nexchat.domain.model.Message
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.flow.Flow
 
 interface ChatRepository {
-    fun getChatsForUser(userId: String): Flow<Resource<List<Chat>>>
-    suspend fun createChatWith(userIds: List<String>): Chat
+    fun observeChats(): Flow<List<Chat>>
+    fun observeChat(chatId: String): Flow<Chat?>
+    suspend fun fetchChatsOnceIfNeeded(userId: String)
+    fun startRealtimeSync(userId: String): ListenerRegistration
+    suspend fun insertChat(chat: Chat)
+    suspend fun retryPendingUpdates()
+    suspend fun refreshChatsFromFirebase(userId: String)
+    fun observeMessages(chatId: String): Flow<List<Message>>
+    suspend fun sendMessage(message: Message)
+    fun startMessageListener(chatId: String): ListenerRegistration
 }

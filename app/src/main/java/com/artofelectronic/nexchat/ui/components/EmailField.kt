@@ -12,22 +12,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun EmailField(
     value: String,
+    label: String,
     error: String?,
     onValueChange: (String) -> Unit
 ) {
     OutlinedTextField(
         value = value,
         onValueChange = onValueChange,
-        label = { Text("Email") },
+        label = { Text(text = label, fontSize = 14.sp) },
         isError = error != null,
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
         leadingIcon = { Icon(Icons.Default.Email, contentDescription = null) },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+        shape = MaterialTheme.shapes.extraLarge
     )
     error?.let {
         Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall)

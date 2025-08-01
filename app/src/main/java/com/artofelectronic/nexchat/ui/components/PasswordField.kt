@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.sp
 
 @Composable
 fun PasswordField(
@@ -34,19 +35,20 @@ fun PasswordField(
     OutlinedTextField(
         value = password,
         onValueChange = onPasswordChange,
-        label = { Text(label) },
+        label = { Text(text = label, fontSize = 14.sp) },
         isError = error != null,
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
-        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = null) },
+        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Lead lock icon") },
         trailingIcon = {
             val icon = if (visible) Icons.Default.Visibility else Icons.Default.VisibilityOff
             IconButton(onClick = { visible = !visible }) {
-                Icon(imageVector = icon, contentDescription = null)
+                Icon(imageVector = icon, contentDescription = "Visibility Icon $label")
             }
         },
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        shape = MaterialTheme.shapes.extraLarge
     )
     error?.let {
         Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall)

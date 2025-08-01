@@ -41,7 +41,7 @@ fun UserListScreen(
         is Resource.Error -> {
             RetryLayout(
                 errorMessage = result.throwable.message ?: stringResource(R.string.unknown_error),
-                onClick = viewModel.syncUsers()
+                onClick = viewModel.observeUsers()
             )
         }
 
@@ -49,7 +49,7 @@ fun UserListScreen(
             if (result.data.isEmpty()) {
                 RetryLayout(
                     errorMessage = stringResource(R.string.no_users_found),
-                    onClick = viewModel.syncUsers()
+                    onClick = viewModel.observeUsers()
                 )
                 return
             }

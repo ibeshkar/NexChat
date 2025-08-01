@@ -37,6 +37,7 @@ navigationTestingAndroid = "2.9.0"
 junitKtx = "1.2.1"
 roomRuntime = "2.7.2"
 firebaseStorageKtx = "21.0.2"
+turbine = "1.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -85,6 +86,7 @@ junit-junit = { group = "junit", name = "junit", version.ref = "junitJunit" }
 androidx-navigation-testing-android = { group = "androidx.navigation", name = "navigation-testing-android", version.ref = "navigationTestingAndroid" }
 androidx-junit-ktx = { group = "androidx.test.ext", name = "junit-ktx", version.ref = "junitKtx" }
 firebase-storage-ktx = { group = "com.google.firebase", name = "firebase-storage-ktx", version.ref = "firebaseStorageKtx" }
+turbine = { module = "app.cash.turbine:turbine", version.ref = "turbine" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

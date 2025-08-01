@@ -56,7 +56,7 @@ fun ChatListScreen(
         is Resource.Error -> {
             RetryLayout(
                 errorMessage = state.throwable.message ?: stringResource(R.string.unknown_error),
-                onClick = viewModel.refreshChats(currentUserId)
+                onClick = viewModel.observeChats(currentUserId)
             )
         }
 

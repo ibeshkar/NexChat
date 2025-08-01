@@ -53,6 +53,7 @@ fun ProfileScreen(
 
     val uiState by viewModel.uiState.collectAsState()
     val userProfile by viewModel.userProfile.collectAsState()
+    val currentUserId = viewModel.currentUserId
 
     var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }

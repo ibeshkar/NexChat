@@ -47,7 +47,7 @@ class ProfileViewModel @Inject constructor(
             _uiState.value = UiState.Loading
             try {
                 if (currentUserId.isNullOrBlank()) {
-                    _uiState.value = UiState.Error("User ID is null")
+                    _uiState.value = UiState.Error("User Id is not valid!")
                     return@launch
                 }
                 _userProfile.value = userProfileUseCase(currentUserId)
@@ -74,14 +74,12 @@ class ProfileViewModel @Inject constructor(
 
         try {
             _uiState.value = UiState.Loading
-            if (isAvatarChanged && avatarUri != null) {
-                viewModelScope.launch {
+            viewModelScope.launch {
+                if (isAvatarChanged && avatarUri != null) {
                     val avatarUrl = updateAvatarUrlUseCase(user.userId, avatarUri)
                     user.copy(avatarUrl = avatarUrl)
                 }
-            }
 
-            viewModelScope.launch {
                 createOrUpdateUserUseCase(user)
                 _userProfile.value = userProfileUseCase(user.userId)
                 _uiState.value = UiState.Success

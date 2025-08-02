@@ -2,10 +2,8 @@ package com.artofelectronic.nexchat.ui.screens
 
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.assertHasClickAction
-import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.assertHeightIsEqualTo
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertWidthIsAtLeast
 import androidx.compose.ui.test.assertWidthIsEqualTo
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -39,27 +37,23 @@ class StartScreenTest {
     fun testIfImageLogoIsAvailable() {
         composeTestRule.onNodeWithContentDescription("Start Screen Image")
             .assertIsDisplayed()
-            .assertWidthIsAtLeast(200.dp)
-            .assertHeightIsAtLeast(200.dp)
+            .assertWidthIsEqualTo(200.dp)
+            .assertHeightIsEqualTo(200.dp)
     }
 
 
     @Test
     fun testIfTitleAndDescriptionAreAvailable() {
-        // Verify welcome text
         composeTestRule.onNodeWithText("Welcome to NEXChat")
             .assertIsDisplayed()
 
-        // Verify message description text
         composeTestRule.onNodeWithText("Connect with friends and family anytime, anywhere.")
             .assertIsDisplayed()
 
-        // Check SignIn button is displayed and has click action
         composeTestRule.onNodeWithText("Sign In")
             .assertIsDisplayed()
             .assertHasClickAction()
 
-        // Check SignUp button is displayed and has click action
         composeTestRule.onNodeWithText("Sign Up")
             .assertIsDisplayed()
             .assertHasClickAction()

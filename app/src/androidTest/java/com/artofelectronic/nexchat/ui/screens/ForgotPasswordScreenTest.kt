@@ -49,7 +49,7 @@ class ForgotPasswordScreenTest {
     }
 
     @Test
-    fun testInvalidEmailAndPasswordEntry() {
+    fun testInvalidEmailEntry() {
         composeTestRule.onNodeWithText("Enter your email to receive a reset link.")
             .assertIsDisplayed()
             .performTextInput(INVALID_EMAIL)

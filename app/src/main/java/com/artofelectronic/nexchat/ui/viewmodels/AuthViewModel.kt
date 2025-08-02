@@ -19,6 +19,7 @@ import com.artofelectronic.nexchat.utils.toDomain
 import com.facebook.AccessToken
 import com.facebook.CallbackManager
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
@@ -50,7 +51,7 @@ open class AuthViewModel @Inject constructor(
 
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             if (checkUserLoggedInUseCase())
                 _loginState.value = LoginState.Authenticated
             else

@@ -9,7 +9,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -32,12 +31,21 @@ fun ForgotPasswordScreen(
     viewModel: AuthViewModel = hiltViewModel()
 ) {
 
+    val uiState by viewModel.uiState.collectAsState()
     val formData by viewModel.authFormData.collectAsState()
-    val resultState by viewModel.uiState.collectAsState()
     val context = navController.context
 
-    LaunchedEffect(true) {
-        if (resultState is UiState.Success) {
+
+    when (val state = uiState) {
+        is UiState.Loading -> {
+            FullScreenLoadingDialog()
+        }
+
+        is UiState.Error -> {
+            Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+        }
+
+        is UiState.Success -> {
             Toast.makeText(
                 context,
                 context.getString(R.string.password_reset_email_sent), Toast.LENGTH_LONG
@@ -45,6 +53,8 @@ fun ForgotPasswordScreen(
 
             navController.navigateUp()
         }
+
+        UiState.Idle -> Unit
     }
 
     AuthContainer {
@@ -69,10 +79,6 @@ fun ForgotPasswordScreen(
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
             )
-        }
-
-        if (resultState is UiState.Loading) {
-            FullScreenLoadingDialog()
         }
     }
 }

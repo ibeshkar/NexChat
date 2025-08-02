@@ -4,8 +4,11 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -20,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -120,7 +124,7 @@ fun SignInScreen(
 
 @Composable
 private fun SignInContent(
-    uiState: AuthFormData,
+    authFormData: AuthFormData,
     onEmailChange: (String) -> Unit,
     onPasswordChange: (String) -> Unit,
     onSignInClick: () -> Unit,
@@ -132,81 +136,106 @@ private fun SignInContent(
 ) {
 
     AuthContainer {
-        EmailField(
-            uiState.email,
-            stringResource(R.string.email_caption),
-            uiState.emailError,
-            onEmailChange
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        PasswordField(
-            label = stringResource(R.string.password_caption),
-            password = uiState.password,
-            error = uiState.passwordError,
-            onPasswordChange = onPasswordChange
-        )
-
-        Spacer(modifier = Modifier.height(6.dp))
-
-        Text(
-            text = stringResource(R.string.forgot_password_caption),
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentWidth(Alignment.End)
-                .clickable { onForgotPasswordClick() },
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.height(30.dp))
-
-        Button(
-            onClick = onSignInClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                stringResource(R.string.sign_in_caption),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+            Column {
+                EmailField(
+                    value = authFormData.email,
+                    label = stringResource(R.string.email_caption),
+                    error = authFormData.emailError,
+                    onValueChange = onEmailChange
+                )
 
-        Spacer(modifier = Modifier.height(50.dp))
+                Spacer(Modifier.height(8.dp))
 
-        OrDivider()
+                PasswordField(
+                    label = stringResource(R.string.password_caption),
+                    password = authFormData.password,
+                    error = authFormData.passwordError,
+                    onPasswordChange = onPasswordChange
+                )
 
-        Spacer(modifier = Modifier.height(30.dp))
+                Spacer(Modifier.height(6.dp))
 
-        SocialAuthRow(
-            onGoogleClick = onGoogleClick,
-            onFacebookClick = onFacebookClick,
-            onTwitterClick = onTwitterClick
-        )
+                Text(
+                    text = stringResource(R.string.forgot_password_caption),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.End)
+                        .clickable { onForgotPasswordClick() },
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary
+                )
 
-        Spacer(modifier = Modifier.height(60.dp))
+                Spacer(Modifier.height(24.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentWidth(Alignment.CenterHorizontally)
-        ) {
-            Text(
-                stringResource(R.string.have_no_account_caption),
-                fontSize = 14.sp
-            )
-            Text(
-                text = stringResource(R.string.sign_up_caption2),
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                fontSize = 14.sp,
-                modifier = Modifier.clickable { onSignUpClick() }
-            )
+                Button(
+                    onClick = onSignInClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text(
+                        text = stringResource(R.string.sign_in_caption),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(Modifier.height(32.dp))
+
+                OrDivider()
+
+                Spacer(Modifier.height(24.dp))
+
+                SocialAuthRow(
+                    onGoogleClick = onGoogleClick,
+                    onFacebookClick = onFacebookClick,
+                    onTwitterClick = onTwitterClick
+                )
+            }
+
+            Spacer(Modifier.height(32.dp))
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+            ) {
+                Text(
+                    stringResource(R.string.have_no_account_caption),
+                    fontSize = 14.sp
+                )
+                Text(
+                    text = stringResource(R.string.sign_up_caption2),
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                    fontSize = 14.sp,
+                    modifier = Modifier.clickable { onSignUpClick() }
+                )
+            }
         }
     }
+}
+
+@Preview
+@Composable
+private fun SignInContentPreview() {
+    SignInContent(
+        authFormData = AuthFormData(),
+        onEmailChange = {},
+        onPasswordChange = {},
+        onSignInClick = {},
+        onGoogleClick = {},
+        onFacebookClick = {},
+        onTwitterClick = {},
+        onSignUpClick = {},
+        onForgotPasswordClick = {}
+    )
 }

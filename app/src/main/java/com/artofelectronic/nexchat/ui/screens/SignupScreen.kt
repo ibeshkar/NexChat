@@ -4,8 +4,11 @@ import android.app.Activity
 import android.widget.Toast
 import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -20,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -32,10 +36,10 @@ import com.artofelectronic.nexchat.ui.components.FullScreenLoadingDialog
 import com.artofelectronic.nexchat.ui.components.OrDivider
 import com.artofelectronic.nexchat.ui.components.PasswordField
 import com.artofelectronic.nexchat.ui.components.SocialAuthRow
-import com.artofelectronic.nexchat.ui.navigation.Screens
 import com.artofelectronic.nexchat.ui.state.UiState
 import com.artofelectronic.nexchat.ui.state.AuthFormData
 import com.artofelectronic.nexchat.utils.NavigationUtil.navigateToChats
+import com.artofelectronic.nexchat.utils.NavigationUtil.navigateToSignIn
 import com.facebook.FacebookCallback
 import com.facebook.FacebookException
 import com.facebook.login.LoginManager
@@ -112,7 +116,7 @@ fun SignupScreen(
         onGoogleClick = viewModel::signupWithGoogle,
         onFacebookClick = onFacebookSignInClick,
         onTwitterClick = { viewModel.signInWithTwitter(context as Activity) },
-        onNavigateToSignIn = { navController.navigate(Screens.SignIn.route) }
+        onNavigateToSignIn = { navController.navigateToSignIn() }
     )
 
 }
@@ -131,78 +135,102 @@ private fun SignupContent(
 ) {
 
     AuthContainer {
-        EmailField(
-            value = authFormData.email,
-            label = stringResource(R.string.email_caption),
-            error = authFormData.emailError,
-            onValueChange = onEmailChange
-        )
-
-        Spacer(Modifier.height(6.dp))
-
-        PasswordField(
-            label = stringResource(R.string.password_caption),
-            password = authFormData.password,
-            error = authFormData.passwordError,
-            onPasswordChange = onPasswordChange
-        )
-
-        Spacer(Modifier.height(6.dp))
-
-        PasswordField(
-            label = stringResource(R.string.confirm_password_caption),
-            password = authFormData.confirmPassword,
-            error = authFormData.confirmPasswordError,
-            onPasswordChange = onConfirmPasswordChange
-        )
-
-        Spacer(Modifier.height(30.dp))
-
-        Button(
-            onClick = onSignupClick,
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(60.dp),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                stringResource(R.string.sign_up_caption),
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
+            Column {
+                EmailField(
+                    value = authFormData.email,
+                    label = stringResource(R.string.email_caption),
+                    error = authFormData.emailError,
+                    onValueChange = onEmailChange
+                )
 
-        Spacer(Modifier.height(50.dp))
+                Spacer(Modifier.height(8.dp))
 
-        OrDivider()
+                PasswordField(
+                    label = stringResource(R.string.password_caption),
+                    password = authFormData.password,
+                    error = authFormData.passwordError,
+                    onPasswordChange = onPasswordChange
+                )
 
-        Spacer(Modifier.height(30.dp))
+                Spacer(Modifier.height(8.dp))
 
-        SocialAuthRow(
-            onGoogleClick = onGoogleClick,
-            onFacebookClick = onFacebookClick,
-            onTwitterClick = onTwitterClick
-        )
+                PasswordField(
+                    label = stringResource(R.string.confirm_password_caption),
+                    password = authFormData.confirmPassword,
+                    error = authFormData.confirmPasswordError,
+                    onPasswordChange = onConfirmPasswordChange
+                )
 
-        Spacer(Modifier.height(60.dp))
+                Spacer(Modifier.height(24.dp))
 
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentWidth(Alignment.CenterHorizontally),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                stringResource(R.string.already_have_an_account_caption),
-                fontSize = 14.sp
-            )
-            Text(
-                stringResource(R.string.sign_in_caption2),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.clickable { onNavigateToSignIn() }
-            )
+                Button(
+                    onClick = onSignupClick,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(60.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text(
+                        stringResource(R.string.sign_up_caption),
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+
+                Spacer(Modifier.height(32.dp))
+
+                OrDivider()
+
+                Spacer(Modifier.height(24.dp))
+
+                SocialAuthRow(
+                    onGoogleClick = onGoogleClick,
+                    onFacebookClick = onFacebookClick,
+                    onTwitterClick = onTwitterClick
+                )
+
+                Spacer(Modifier.height(32.dp))
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .wrapContentWidth(Alignment.CenterHorizontally),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        stringResource(R.string.already_have_an_account_caption),
+                        fontSize = 14.sp
+                    )
+                    Text(
+                        stringResource(R.string.sign_in_caption2),
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.clickable { onNavigateToSignIn() }
+                    )
+                }
+
+            }
         }
     }
+}
+
+@Preview
+@Composable
+private fun SignupContentPreview() {
+    SignupContent(
+        authFormData = AuthFormData(),
+        onEmailChange = {},
+        onPasswordChange = {},
+        onConfirmPasswordChange = {},
+        onSignupClick = {},
+        onGoogleClick = {},
+        onFacebookClick = {},
+        onTwitterClick = {},
+        onNavigateToSignIn = {}
+    )
 }

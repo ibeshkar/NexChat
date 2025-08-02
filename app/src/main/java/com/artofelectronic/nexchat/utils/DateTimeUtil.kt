@@ -55,7 +55,7 @@ fun Timestamp.toLocalDate(): LocalDate = this.toDate()
 
 
 /**
- * Converts a LocalDate to a verbose label (e.g., "Today", "Yesterday", or "dd/MM/yyyy").
+ * Converts a LocalDate to a verbose label (e.g., "Today", "Yesterday", or "d/M/yyyy").
  */
 @RequiresApi(Build.VERSION_CODES.O)
 fun LocalDate.toVerboseLabel(): String {

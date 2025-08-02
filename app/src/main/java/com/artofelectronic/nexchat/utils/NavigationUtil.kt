@@ -15,6 +15,7 @@ object NavigationUtil {
     fun NavController.navigateToSignup() {
         this.navigate(Screens.SignUp.route) {
             popUpTo(Screens.SignIn.route) { inclusive = true }
+            launchSingleTop = true
         }
     }
 
@@ -23,7 +24,10 @@ object NavigationUtil {
     }
 
     fun NavController.navigateToForgotPassword() {
-        this.navigate(Screens.ForgotPassword.route)
+        this.navigate(Screens.ForgotPassword.route){
+            popUpTo(Screens.SignIn.route) { inclusive = false }
+            launchSingleTop = true
+        }
     }
 
     fun NavController.navigateToChats() {

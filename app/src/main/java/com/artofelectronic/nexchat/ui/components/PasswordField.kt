@@ -1,6 +1,7 @@
 package com.artofelectronic.nexchat.ui.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lock
@@ -21,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
@@ -42,7 +44,7 @@ fun PasswordField(
         leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Lead lock icon") },
         trailingIcon = {
             val icon = if (visible) Icons.Default.Visibility else Icons.Default.VisibilityOff
-            IconButton(onClick = { visible = !visible }) {
+            IconButton(onClick = { visible = !visible }, modifier = Modifier.padding(horizontal = 8.dp)) {
                 Icon(imageVector = icon, contentDescription = "Visibility Icon $label")
             }
         },

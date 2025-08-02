@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -47,9 +48,12 @@ fun ChatListItem(
 
         CircleAvatar(
             imageUrl = otherUser?.avatarUrl.orEmpty(),
+            userName = otherUser?.displayName,
             size = 60.dp,
             contentDescription = "${chat.chatId}'s avatar",
         )
+
+        Spacer(modifier = Modifier.padding(5.dp))
 
         Box(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.fillMaxWidth()) {

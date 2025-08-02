@@ -28,6 +28,7 @@ fun UserListItem(user: User, onClick: () -> Unit) {
     ) {
         CircleAvatar(
             imageUrl = user.avatarUrl,
+            userName = user.displayName,
             size = 60.dp
         )
 

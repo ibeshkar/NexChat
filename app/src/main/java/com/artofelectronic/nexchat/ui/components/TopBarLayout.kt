@@ -15,6 +15,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,6 +36,7 @@ import com.artofelectronic.nexchat.ui.navigation.Screens
 import com.artofelectronic.nexchat.ui.state.UiState
 import com.artofelectronic.nexchat.ui.viewmodels.ProfileViewModel
 import com.artofelectronic.nexchat.utils.NavigationUtil.navigateToStart
+import com.artofelectronic.nexchat.utils.displayName
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -80,6 +82,12 @@ fun TopBarLayout(
     }
 
     TopAppBar(
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.primary,
+            navigationIconContentColor = MaterialTheme.colorScheme.primary
+        ),
         title = {
             when (currentRoute) {
                 Screens.Chats.route -> {
@@ -115,7 +123,7 @@ fun TopBarLayout(
                         profileViewModel.fetchUserProfile(otherUserId.orEmpty())
 
                         val avatarUrl = profile?.avatarUrl.orEmpty()
-                        val displayName = profile?.displayName ?: "User"
+                        val displayName = profile?.displayName() ?: "Unknown User"
 
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             if (avatarUrl.isNotEmpty()) {

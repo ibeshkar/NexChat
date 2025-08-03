@@ -16,7 +16,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.artofelectronic.nexchat.domain.model.Message
-import com.artofelectronic.nexchat.ui.theme.GreenBubble
 import com.artofelectronic.nexchat.utils.toTimeOnly
 
 @Composable
@@ -30,18 +29,19 @@ fun MessageBubble(
     ) {
 
         Surface(
-            modifier = Modifier.padding(vertical = 10.dp),
+            modifier = Modifier.padding(vertical = 5.dp),
             shape = RoundedCornerShape(
                 topStart = 12.dp,
                 topEnd = 12.dp,
                 bottomStart = if (isMine) 12.dp else 0.dp,
                 bottomEnd = if (!isMine) 12.dp else 0.dp
             ),
-            color = if (isMine) GreenBubble else Color.White,
-            shadowElevation = 1.dp,
-            tonalElevation = 1.dp
+            color = if (isMine) MaterialTheme.colorScheme.surfaceContainer else MaterialTheme.colorScheme.onSecondary,
+            shadowElevation = 1.dp
         ) {
-            Column(modifier = Modifier.widthIn(max = 250.dp).padding(16.dp)) {
+            Column(modifier = Modifier
+                .widthIn(max = 250.dp)
+                .padding(8.dp)) {
                 Text(
                     text = message.text,
                     style = MaterialTheme.typography.bodyMedium,

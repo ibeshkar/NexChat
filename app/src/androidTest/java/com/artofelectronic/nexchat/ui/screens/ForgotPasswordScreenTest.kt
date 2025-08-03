@@ -44,8 +44,8 @@ class ForgotPasswordScreenTest {
     fun testIfLogoIsAvailable() {
         composeTestRule.onNodeWithContentDescription("Top Image")
             .assertIsDisplayed()
-            .assertWidthIsEqualTo(130.dp)
-            .assertHeightIsEqualTo(130.dp)
+            .assertWidthIsEqualTo(180.dp)
+            .assertHeightIsEqualTo(180.dp)
     }
 
     @Test

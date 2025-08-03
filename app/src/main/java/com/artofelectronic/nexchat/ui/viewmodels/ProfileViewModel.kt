@@ -13,6 +13,7 @@ import com.artofelectronic.nexchat.ui.state.UiState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -27,15 +28,15 @@ class ProfileViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow<UiState>(UiState.Idle)
-    val uiState: StateFlow<UiState> = _uiState
+    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
     val currentUserId = getCurrentUserIdUseCase()
 
     private val _userProfile = MutableStateFlow<User?>(null)
-    val userProfile: StateFlow<User?> = _userProfile
+    val userProfile: StateFlow<User?> = _userProfile.asStateFlow()
 
     private val _signOutState = MutableStateFlow<UiState>(UiState.Idle)
-    val signOutState: StateFlow<UiState> = _signOutState
+    val signOutState: StateFlow<UiState> = _signOutState.asStateFlow()
 
 
     init {

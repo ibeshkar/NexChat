@@ -2,7 +2,9 @@ package com.artofelectronic.nexchat.utils
 
 
 import androidx.compose.ui.graphics.Color
+import com.artofelectronic.nexchat.domain.model.User
 import kotlin.math.absoluteValue
+import kotlin.text.ifEmpty
 
 
 fun String.getColorFromName(): Color {
@@ -18,3 +20,7 @@ fun String.getColorFromName(): Color {
     val index = (this.hashCode().absoluteValue) % colors.size
     return colors[index]
 }
+
+fun User.displayName(): String? = displayName
+    .ifEmpty { email.substringBefore("@") }
+    .ifEmpty { "User ${userId.take(3)}..." }

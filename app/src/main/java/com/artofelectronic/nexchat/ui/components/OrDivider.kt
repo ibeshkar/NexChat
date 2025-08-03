@@ -25,19 +25,19 @@ fun OrDivider() {
             modifier = Modifier
                 .weight(1f)
                 .height(1.dp),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+            color = MaterialTheme.colorScheme.outline
         )
         Text(
             text = "or Sign In with",
             modifier = Modifier.padding(horizontal = 8.dp),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+            color = MaterialTheme.colorScheme.outline,
             fontSize = 14.sp
         )
         HorizontalDivider(
             modifier = Modifier
                 .weight(1f)
                 .height(1.dp),
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+            color = MaterialTheme.colorScheme.outline
         )
     }
 }

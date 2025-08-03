@@ -158,7 +158,7 @@ class ChatRepositoryImpl @Inject constructor(
     /**
      * Send a message to the Firebase collection.
      */
-    override suspend fun sendMessage(message: Message) {
+    override suspend fun sendMessage(message: Message, receiver: String) {
         val chatRef = chatCollectionRef().document(message.chatId)
         val messageRef = chatRef.collection(COLLECTION_MESSAGES).document(message.messageId)
 
@@ -167,12 +167,12 @@ class ChatRepositoryImpl @Inject constructor(
         // Save message locally
         messageDao.insert(MessageEntity.fromDomain(deliveredMessage))
 
-        val updatedChat = Chat.fromMessage(message)
+        val updatedChat = Chat.fromMessage(message, receiver)
 
         // Save chat locally
         chatDao.insert(ChatEntity.fromDomain(updatedChat))
 
-        // Save both chat metadata and message in Firestore atomically
+        // Save both chat and message in Firestore atomically
         firestore.runBatch { batch ->
             batch.set(chatRef, updatedChat, SetOptions.merge())
             batch.set(messageRef, deliveredMessage)

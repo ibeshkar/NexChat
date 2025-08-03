@@ -75,13 +75,21 @@ class ChatViewModelTest {
     }
 
     @Test
-    fun `init should set currentUserId`() = runTest {
-        assertEquals(Fake_UserId, chatViewModel.currentUserId.value)
-    }
-
-    @Test
     fun `observeChats with null userId emit error`() = runTest {
-        chatViewModel.observeChats(null)
+        coEvery { getCurrentUserIdUseCase() } returns null
+
+        chatViewModel = ChatViewModel(
+            getCurrentUserIdUseCase,
+            observeChatsUseCase,
+            fetchChatsOnceIfNeededUseCase,
+            chatRealtimeSyncUseCase,
+            observeMessagesUseCase,
+            sendMessageUseCase,
+            getMessagesUseCase,
+            fetchUserProfileUseCase,
+        )
+
+        chatViewModel.observeChats()
 
         val state = chatViewModel.chatList.value
         assertTrue(state is Resource.Error)
@@ -95,7 +103,20 @@ class ChatViewModelTest {
 
     @Test
     fun `observeChats with empty userId sets error`() = runTest {
-        chatViewModel.observeChats("")
+        coEvery { getCurrentUserIdUseCase() } returns ""
+
+        chatViewModel = ChatViewModel(
+            getCurrentUserIdUseCase,
+            observeChatsUseCase,
+            fetchChatsOnceIfNeededUseCase,
+            chatRealtimeSyncUseCase,
+            observeMessagesUseCase,
+            sendMessageUseCase,
+            getMessagesUseCase,
+            fetchUserProfileUseCase,
+        )
+
+        chatViewModel.observeChats()
 
         val state = chatViewModel.chatList.value
         assertTrue(state is Resource.Error)
@@ -111,8 +132,20 @@ class ChatViewModelTest {
         coEvery { fetchChatsOnceIfNeededUseCase(any()) } just Runs
         every { chatRealtimeSyncUseCase(any()) } returns mockk()
         every { observeChatsUseCase() } returns flowOf(chats)
+        coEvery { getCurrentUserIdUseCase() } returns Fake_UserId
 
-        chatViewModel.observeChats(Fake_UserId)
+        chatViewModel = ChatViewModel(
+            getCurrentUserIdUseCase,
+            observeChatsUseCase,
+            fetchChatsOnceIfNeededUseCase,
+            chatRealtimeSyncUseCase,
+            observeMessagesUseCase,
+            sendMessageUseCase,
+            getMessagesUseCase,
+            fetchUserProfileUseCase,
+        )
+
+        chatViewModel.observeChats()
         testScheduler.advanceUntilIdle()
 
         val state = chatViewModel.chatList.value
@@ -155,14 +188,15 @@ class ChatViewModelTest {
 
     @Test
     fun `sendMessage should call use case`() = runTest {
-        coEvery { sendMessageUseCase(any()) } just Runs
+        coEvery { sendMessageUseCase(any(),any()) } just Runs
 
         chatViewModel.sendMessage(Fake_ChatId, "Hello", Fake_UserId, Fake_ReceiverId)
         testScheduler.advanceUntilIdle()
 
         coVerify {
             sendMessageUseCase(
-                match { it.text == "Hello" && it.chatId == Fake_ChatId }
+                match { it.text == "Hello" && it.chatId == Fake_ChatId },
+                Fake_ReceiverId
             )
         }
     }

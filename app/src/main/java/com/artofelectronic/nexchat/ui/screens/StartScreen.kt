@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -38,41 +39,40 @@ fun StartScreen(navController: NavController) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-            .padding(horizontal = 32.dp)
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .padding(horizontal = 24.dp)
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
 
             Image(
-                painter = painterResource(id = R.drawable.start_screen),
+                painter = painterResource(id = R.drawable.retro_top_image),
                 contentDescription = "Start Screen Image",
-                modifier = Modifier.size(200.dp)
+                modifier = Modifier.size(250.dp)
             )
 
-            Spacer(modifier = Modifier.height(40.dp))
-
             Text(
-                text = "Welcome to NEXChat",
-                color = MaterialTheme.colorScheme.primary,
+                text = stringResource(R.string.welcome_to_nexchat_title),
+                color = MaterialTheme.colorScheme.onBackground,
+                fontSize = 21.sp,
                 fontWeight = FontWeight.Bold,
-                fontSize = 32.sp,
                 textAlign = TextAlign.Center
             )
 
+            Spacer(modifier = Modifier.height(8.dp))
+
             Text(
-                text = "Connect with friends and family anytime, anywhere.",
-                color = MaterialTheme.colorScheme.primary,
+                text = stringResource(R.string.connect_with_friends_and_family_anytime_anywhere_text),
+                color = MaterialTheme.colorScheme.onBackground,
                 fontSize = 14.sp,
                 textAlign = TextAlign.Center
             )
 
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(40.dp))
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
@@ -82,37 +82,28 @@ fun StartScreen(navController: NavController) {
                     onClick = { navController.navigateToSignIn() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp)
                         .widthIn(max = 320.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     )
                 ) {
-                    Text("Sign In", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(R.string.sign_in_caption), fontWeight = FontWeight.Bold)
                 }
-
-                Spacer(modifier = Modifier.height(20.dp))
 
                 Button(
                     onClick = { navController.navigateToSignup() },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(60.dp)
                         .widthIn(max = 320.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.onPrimary
+                        containerColor = MaterialTheme.colorScheme.background,
+                        contentColor = MaterialTheme.colorScheme.onBackground
                     )
                 ) {
-                    Text(
-                        "Sign Up",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.primary
-                    )
+                    Text(stringResource(R.string.sign_up_caption), fontWeight = FontWeight.Bold)
                 }
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
         }
     }
 }

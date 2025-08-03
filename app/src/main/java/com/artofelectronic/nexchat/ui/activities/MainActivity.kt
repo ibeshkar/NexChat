@@ -6,10 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
 import com.artofelectronic.nexchat.ui.components.AppEntryPoint
 import com.artofelectronic.nexchat.ui.theme.NexChatTheme
 import com.artofelectronic.nexchat.ui.viewmodels.AuthViewModel
@@ -27,12 +23,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             NexChatTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    AppEntryPoint()
-                }
+                AppEntryPoint()
             }
         }
     }

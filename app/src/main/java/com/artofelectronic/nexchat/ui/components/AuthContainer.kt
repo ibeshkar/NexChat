@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -30,7 +31,7 @@ fun AuthContainer(content: @Composable () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.surface)
     ) {
         Column(
             modifier = Modifier
@@ -38,28 +39,24 @@ fun AuthContainer(content: @Composable () -> Unit) {
                 .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(Modifier.height(32.dp))
-
             Image(
-                painter = painterResource(id = R.drawable.start_screen),
+                painter = painterResource(id = R.drawable.loading_items),
                 contentDescription = "Top Image",
-                modifier = Modifier
-                    .heightIn(max = 130.dp)
-                    .aspectRatio(1f)
+                modifier = Modifier.size(180.dp)
             )
 
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(24.dp))
 
             Box(
                 modifier = Modifier
                     .padding(horizontal = 16.dp)
                     .background(
-                        color = MaterialTheme.colorScheme.onSecondary,
+                        color = MaterialTheme.colorScheme.onTertiary,
                         shape = RoundedCornerShape(30.dp)
                     )
                     .border(
                         width = 1.dp,
-                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.1f),
+                        color = MaterialTheme.colorScheme.outline,
                         shape = RoundedCornerShape(30.dp)
                     )
                     .fillMaxWidth()
@@ -78,7 +75,7 @@ fun AuthContainer(content: @Composable () -> Unit) {
 
 @Preview
 @Composable
-private fun AuthContainerPreview(){
+private fun AuthContainerPreview() {
     AuthContainer {
         Text("Hello World!!!")
     }

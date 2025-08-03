@@ -3,11 +3,16 @@ package com.artofelectronic.nexchat.ui.components
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +36,11 @@ fun AppScaffold(startDestination: String) {
     val showFab = currentRoute == Screens.Chats.route
 
     Scaffold(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
+            .systemBarsPadding(),
+        contentWindowInsets = WindowInsets(0,0,0,0),
         topBar = {
             TopBarLayout(navController)
         },
@@ -42,7 +52,9 @@ fun AppScaffold(startDestination: String) {
         floatingActionButton = {
             AnimatedVisibility(showFab) {
                 FloatingActionButton(
-                    onClick = { navController.navigateToUserList() }
+                    onClick = { navController.navigateToUserList() },
+                    containerColor = MaterialTheme.colorScheme.secondary,
+                    contentColor = MaterialTheme.colorScheme.onSecondary
                 ) {
                     Icon(Icons.Default.Add, contentDescription = "User List")
                 }

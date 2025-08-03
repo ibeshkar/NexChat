@@ -15,9 +15,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.artofelectronic.nexchat.domain.model.User
+import com.artofelectronic.nexchat.utils.displayName
 
 @Composable
 fun UserListItem(user: User, onClick: () -> Unit) {
+
+    val displayName = user.displayName() ?: "Unknown User"
+
     Row(
         Modifier
             .fillMaxWidth()
@@ -28,14 +32,14 @@ fun UserListItem(user: User, onClick: () -> Unit) {
     ) {
         CircleAvatar(
             imageUrl = user.avatarUrl,
-            userName = user.displayName,
+            userName = displayName,
             size = 60.dp
         )
 
         Spacer(modifier = Modifier.padding(5.dp))
 
         Text(
-            text = user.displayName.ifEmpty { user.email },
+            text = displayName,
             color = Color.Black,
             fontWeight = FontWeight.Bold,
             overflow = TextOverflow.Ellipsis,

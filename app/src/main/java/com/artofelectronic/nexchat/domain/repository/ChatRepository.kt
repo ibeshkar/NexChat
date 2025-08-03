@@ -14,6 +14,6 @@ interface ChatRepository {
     suspend fun retryPendingUpdates()
     suspend fun refreshChatsFromFirebase(userId: String)
     fun observeMessages(chatId: String): Flow<List<Message>>
-    suspend fun sendMessage(message: Message)
+    suspend fun sendMessage(message: Message, receiver: String)
     fun startMessageListener(chatId: String): ListenerRegistration
 }

@@ -37,8 +37,8 @@ class StartScreenTest {
     fun testIfImageLogoIsAvailable() {
         composeTestRule.onNodeWithContentDescription("Start Screen Image")
             .assertIsDisplayed()
-            .assertWidthIsEqualTo(200.dp)
-            .assertHeightIsEqualTo(200.dp)
+            .assertWidthIsEqualTo(250.dp)
+            .assertHeightIsEqualTo(250.dp)
     }
 
 

@@ -14,11 +14,13 @@ import com.artofelectronic.nexchat.domain.usecases.chats.ObserveMessagesUseCase
 import com.artofelectronic.nexchat.domain.usecases.chats.SendMessageUseCase
 import com.artofelectronic.nexchat.domain.usecases.chats.ChatRealtimeSyncUseCase
 import com.artofelectronic.nexchat.utils.Resource
+import com.artofelectronic.nexchat.utils.displayName
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.ListenerRegistration
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.util.UUID
@@ -37,42 +39,37 @@ class ChatViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _chatList = MutableStateFlow<Resource<List<Chat>>>(Resource.Loading())
-    val chatList: StateFlow<Resource<List<Chat>>> = _chatList
+    val chatList: StateFlow<Resource<List<Chat>>> = _chatList.asStateFlow()
 
-    private val _currentUserId = MutableStateFlow<String?>(null)
-    val currentUserId: StateFlow<String?> = _currentUserId
+    private val _userProfiles = MutableStateFlow<Map<String, User?>>(emptyMap())
+    val userProfiles: StateFlow<Map<String, User?>> = _userProfiles.asStateFlow()
 
     private val _userProfile = MutableStateFlow<User?>(null)
-    val userProfile: StateFlow<User?> = _userProfile
+    val userProfile: StateFlow<User?> = _userProfile.asStateFlow()
 
     private val _messages = MutableStateFlow<List<Message>>(emptyList())
-    val messages: StateFlow<List<Message>> = _messages
-
-    private val _logoutState = MutableStateFlow(false)
-    val logoutState: StateFlow<Boolean> = _logoutState
+    val messages: StateFlow<List<Message>> = _messages.asStateFlow()
 
     private var chatsListener: ListenerRegistration? = null
     private var messageListener: ListenerRegistration? = null
 
+    val currentUserId = getCurrentUserIdUseCase()
+
 
     init {
-        getCurrentUserId()
+        observeChats()
     }
 
-    private fun getCurrentUserId() {
-        _currentUserId.value = getCurrentUserIdUseCase()
-    }
-
-    fun observeChats(userId: String?) {
+    fun observeChats() {
         viewModelScope.launch {
             try {
-                if (userId.isNullOrEmpty()) {
+                if (currentUserId.isNullOrEmpty()) {
                     _chatList.value = Resource.Error(Throwable("User Id is not valid!"))
                     return@launch
                 }
 
-                fetchChatsOnceIfNeededUseCase(userId)
-                chatsListener = chatRealtimeSyncUseCase(userId)
+                fetchChatsOnceIfNeededUseCase(currentUserId)
+                chatsListener = chatRealtimeSyncUseCase(currentUserId)
                 observeChatsUseCase().collectLatest { chats ->
                     _chatList.value = Resource.Success(chats)
                 }
@@ -108,6 +105,8 @@ class ChatViewModel @Inject constructor(
 
     fun sendMessage(chatId: String, message: String, senderId: String, receiverId: String) {
         viewModelScope.launch {
+            val receiver = fetchUserProfileUseCase(receiverId)?.displayName() ?: "Unknown User"
+
             val message = Message(
                 messageId = UUID.randomUUID().toString(),
                 chatId = chatId,
@@ -116,7 +115,8 @@ class ChatViewModel @Inject constructor(
                 text = message,
                 timestamp = Timestamp.now()
             )
-            sendMessageUseCase(message)
+
+            sendMessageUseCase(message, receiver)
         }
     }
 

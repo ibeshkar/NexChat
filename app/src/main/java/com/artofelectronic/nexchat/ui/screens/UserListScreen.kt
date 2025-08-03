@@ -1,15 +1,17 @@
 package com.artofelectronic.nexchat.ui.screens
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.artofelectronic.nexchat.R
 import com.artofelectronic.nexchat.ui.components.FullScreenLoadingDialog
 import com.artofelectronic.nexchat.ui.components.RetryLayout
 import com.artofelectronic.nexchat.ui.components.UserListItem
@@ -40,21 +42,21 @@ fun UserListScreen(
 
         is Resource.Error -> {
             RetryLayout(
-                errorMessage = result.throwable.message ?: stringResource(R.string.unknown_error),
-                onClick = viewModel.observeUsers()
+                onClick = { viewModel.observeUsers() }
             )
         }
 
         is Resource.Success -> {
             if (result.data.isEmpty()) {
                 RetryLayout(
-                    errorMessage = stringResource(R.string.no_users_found),
-                    onClick = viewModel.observeUsers()
+                    onClick = { viewModel.observeUsers() }
                 )
                 return
             }
 
-            LazyColumn {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.surface)
+            ) {
                 items(result.data.filter { it.userId != currentUserId }) { user ->
                     UserListItem(user) {
                         viewModel.onUserSelected(currentUserId, user.userId)

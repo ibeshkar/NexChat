@@ -32,7 +32,7 @@ fun SocialButton(provider: AuthProvider, onClick: () -> Unit) {
         modifier = Modifier.size(60.dp),
         shape = CircleShape,
         colors = ButtonDefaults.buttonColors(
-            containerColor = MaterialTheme.colorScheme.primary
+            containerColor = MaterialTheme.colorScheme.tertiary
         ),
         elevation = ButtonDefaults.elevatedButtonElevation(
             defaultElevation = 4.dp

@@ -1,63 +1,52 @@
 package com.artofelectronic.nexchat.ui.theme
 
-import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.dynamicDarkColorScheme
-import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 
-val LightColorScheme = lightColorScheme(
-    primary = BluePrimary,
-    secondary = GraySecondary,
-    background = BackgroundLight,
-    surface = SurfaceLight,
-    onPrimary = OnPrimaryText,
-    onSecondary = OnSecondaryTextLight,
-    tertiary = PurpleTertiary,
-    onTertiary = OnPurpleTertiary,
-    tertiaryContainer = PurpleTertiaryContainer,
-    onTertiaryContainer = OnPurpleTertiaryContainer,
-    error = ErrorRed
+// Light Color Scheme
+val NEXChatLightColorScheme = lightColorScheme(
+    primary = NEXChatLightPrimary,
+    onPrimary = NEXChatLightOnPrimary,
+    secondary = NEXChatLightSecondary,
+    onSecondary = NEXChatLightOnSecondary,
+    background = NEXChatLightBackground,
+    onBackground = NEXChatLightOnBackground,
+    surface = NEXChatLightSurface,
+    onSurface = NEXChatLightOnBackground,
+    outline = NEXChatLightOutline,
+    tertiary = NEXChatLightTertiary,
+    surfaceContainer = NEXChatLightOutgoingMsg
 )
 
-val DarkColorScheme = darkColorScheme(
-    primary = BluePrimary,
-    secondary = CharcoalSecondaryDark,
-    background = BackgroundDark,
-    surface = SurfaceDark,
-    onPrimary = OnPrimaryText,
-    onSecondary = OnSecondaryTextDark,
-    tertiary = PurpleTertiary,
-    onTertiary = OnPurpleTertiary,
-    tertiaryContainer = PurpleTertiaryContainer,
-    onTertiaryContainer = OnPurpleTertiaryContainer,
-    error = ErrorRedDark
+// Dark Color Scheme
+val NEXChatDarkColorScheme = darkColorScheme(
+    primary = NEXChatDarkPrimary,
+    onPrimary = NEXChatDarkOnPrimary,
+    secondary = NEXChatDarkSecondary,
+    onSecondary = NEXChatDarkOnSecondary,
+    background = NEXChatDarkBackground,
+    onBackground = NEXChatDarkOnBackground,
+    surface = NEXChatDarkSurface,
+    onSurface = NEXChatDarkOnBackground,
+    outline = NEXChatDarkOutline,
+    tertiary = NEXChatDarkTertiary,
+    surfaceContainer = NEXChatDarkOutgoingMsg
 )
 
 @Composable
 fun NexChatTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    useDarkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
+    val colorScheme = if (useDarkTheme) NEXChatDarkColorScheme else NEXChatLightColorScheme
 
     MaterialTheme(
         colorScheme = colorScheme,
-        typography = Typography,
+        typography = MaterialTheme.typography,
+        shapes = MaterialTheme.shapes,
         content = content
     )
 }

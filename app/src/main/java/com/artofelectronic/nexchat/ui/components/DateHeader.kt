@@ -23,12 +23,12 @@ fun DateHeader(date: LocalDate) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 10.dp),
         contentAlignment = Alignment.Center
     ) {
         Surface(
-            color = Color.LightGray.copy(alpha = 0.2f),
-            shape = RoundedCornerShape(12.dp)
+            color = MaterialTheme.colorScheme.onSecondary,
+            shape = RoundedCornerShape(6.dp)
         ) {
             Text(
                 text = date.toVerboseLabel(),

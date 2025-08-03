@@ -23,13 +23,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.artofelectronic.nexchat.R
 import com.artofelectronic.nexchat.domain.model.Chat
-import com.artofelectronic.nexchat.domain.model.User
 import com.artofelectronic.nexchat.utils.toVerboseDate
 
 @Composable
 fun ChatListItem(
     chat: Chat,
-    otherUser: User?,
+    avatarUrl: String,
     onChatClick: (String) -> Unit
 ) {
 
@@ -47,8 +46,8 @@ fun ChatListItem(
     ) {
 
         CircleAvatar(
-            imageUrl = otherUser?.avatarUrl.orEmpty(),
-            userName = otherUser?.displayName,
+            imageUrl = avatarUrl,
+            userName = chat.receiver,
             size = 60.dp,
             contentDescription = "${chat.chatId}'s avatar",
         )
@@ -58,7 +57,7 @@ fun ChatListItem(
         Box(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
-                    text = otherUser?.displayName.orEmpty(),
+                    text = chat.receiver ?: "Unknown User",
                     color = Color.Black,
                     fontWeight = FontWeight.Bold,
                     overflow = TextOverflow.Ellipsis,

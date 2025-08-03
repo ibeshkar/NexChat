@@ -9,12 +9,14 @@ import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -53,7 +55,6 @@ fun ProfileScreen(
 
     val uiState by viewModel.uiState.collectAsState()
     val userProfile by viewModel.userProfile.collectAsState()
-    val currentUserId = viewModel.currentUserId
 
     var galleryImageUri by remember { mutableStateOf<Uri?>(null) }
     var cameraImageUri by remember { mutableStateOf<Uri?>(null) }
@@ -140,7 +141,7 @@ fun ProfileScreen(
 
         is UiState.Error -> {
             RetryLayout(
-                errorMessage = state.message, onClick = viewModel.getUserProfile()
+                onClick = { viewModel.getUserProfile() }
             )
         }
 
@@ -152,6 +153,7 @@ fun ProfileScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.surface)
             .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -197,11 +199,16 @@ fun ProfileScreen(
         Button(
             onClick = {
                 viewModel.updateUserProfile(
-                    user = userProfile?.copy(
-                        displayName = displayName, bio = bio
-                    ), isAvatarChanged = isAvatarChanged, avatarUri = galleryImageUri
+                    user = userProfile?.copy(displayName = displayName, bio = bio),
+                    isAvatarChanged = isAvatarChanged,
+                    avatarUri = galleryImageUri ?: cameraImageUri
                 )
-            }) {
+            },
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            )
+        ) {
             Text(stringResource(R.string.save_changes_caption))
         }
     }

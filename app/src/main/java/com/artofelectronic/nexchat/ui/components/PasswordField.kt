@@ -12,6 +12,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,16 +42,26 @@ fun PasswordField(
         isError = error != null,
         singleLine = true,
         modifier = Modifier.fillMaxWidth(),
-        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Lead lock icon") },
+        leadingIcon = { Icon(Icons.Default.Lock, contentDescription = "Lead lock icon", tint = MaterialTheme.colorScheme.tertiary) },
         trailingIcon = {
             val icon = if (visible) Icons.Default.Visibility else Icons.Default.VisibilityOff
             IconButton(onClick = { visible = !visible }, modifier = Modifier.padding(horizontal = 8.dp)) {
-                Icon(imageVector = icon, contentDescription = "Visibility Icon $label")
+                Icon(imageVector = icon, contentDescription = "Visibility Icon $label", tint = MaterialTheme.colorScheme.tertiary)
             }
         },
         visualTransformation = if (visible) VisualTransformation.None else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        shape = MaterialTheme.shapes.extraLarge
+        shape = MaterialTheme.shapes.extraLarge,
+        colors = TextFieldDefaults.colors(
+            focusedContainerColor = MaterialTheme.colorScheme.onTertiary,
+            unfocusedContainerColor = MaterialTheme.colorScheme.onTertiary,
+            focusedTextColor = MaterialTheme.colorScheme.onBackground,
+            unfocusedTextColor = MaterialTheme.colorScheme.onBackground,
+            focusedLabelColor = MaterialTheme.colorScheme.tertiary,
+            unfocusedLabelColor = MaterialTheme.colorScheme.onBackground,
+            focusedIndicatorColor = MaterialTheme.colorScheme.tertiary,
+            unfocusedIndicatorColor = MaterialTheme.colorScheme.outline,
+        )
     )
     error?.let {
         Text(it, color = Color.Red, style = MaterialTheme.typography.bodySmall)

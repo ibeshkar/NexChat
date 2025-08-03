@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -21,6 +22,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
@@ -167,7 +169,7 @@ private fun SignInContent(
                         .clickable { onForgotPasswordClick() },
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = Color.Blue
                 )
 
                 Spacer(Modifier.height(24.dp))
@@ -176,14 +178,14 @@ private fun SignInContent(
                     onClick = onSignInClick,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp),
+                        .widthIn(max = 320.dp),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
+                        containerColor = MaterialTheme.colorScheme.secondary,
+                        contentColor = MaterialTheme.colorScheme.onSecondary
                     )
                 ) {
                     Text(
                         text = stringResource(R.string.sign_in_caption),
-                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -206,7 +208,8 @@ private fun SignInContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .wrapContentWidth(Alignment.CenterHorizontally)
+                    .wrapContentWidth(Alignment.CenterHorizontally),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     stringResource(R.string.have_no_account_caption),
@@ -215,7 +218,7 @@ private fun SignInContent(
                 Text(
                     text = stringResource(R.string.sign_up_caption2),
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = Color.Blue,
                     fontSize = 14.sp,
                     modifier = Modifier.clickable { onSignUpClick() }
                 )

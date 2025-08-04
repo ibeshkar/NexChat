@@ -8,16 +8,17 @@
 - **User Authentication**: Secure sign-in and sign-up using Firebase Authentication.
 - **Profile Management**: Users can create and edit their profiles with avatars and status messages.
 - **Media Sharing**: Send and receive images and other media files.
-- **Push Notifications**: Stay updated with message alerts via Firebase Cloud Messaging.
+- **Push Notifications**: Stay updated with message alerts via Firebase Cloud Messaging.(Not implemented yet)
 - **Dark Mode Support**: Enhanced user experience with theme switching.
-- **End-to-End Encryption**: Ensuring privacy and security in conversations.
+- **End-to-End Encryption**: Ensuring privacy and security in conversations.(Not implemented yet)
 
 ## 🛠️ Tech Stack
 
 - **Language**: Kotlin
 - **UI Framework**: Jetpack Compose
-- **Architecture**: MVVM (Model-View-ViewModel)
+- **Architecture**: MVVM (Model-View-ViewModel) & Clean Architecture
 - **Backend Services**: Firebase Authentication, Realtime Database, Cloud Storage, Cloud Messaging
 - **Dependency Injection**: Hilt
 - **Image Loading**: Coil
+
 - **Navigation**: Jetpack Navigation Component

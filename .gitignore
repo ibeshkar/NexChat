@@ -1,0 +1,54 @@
+# Default ignored files
+/shelf/
+/workspace.xml
+
+# =========================
+# Android / Gradle
+# =========================
+.gradle/
+build/
+app/build/
+**/build/
+
+# Local configuration
+local.properties
+gradle.properties
+
+# Log files
+*.log
+
+# =========================
+# Android Studio / IntelliJ IDEA
+# =========================
+.idea/
+*.iml
+*.ipr
+*.iws
+out/
+
+# =========================
+# macOS junk files
+# =========================
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# =========================
+# APK / Bundles / Generated
+# =========================
+*.apk
+*.ap_
+*.aab
+
+# =========================
+# Keystore files (never commit secrets!)
+# =========================
+*.jks
+*.keystore
+
+# =========================
+# Misc
+# =========================
+captures/
+.externalNativeBuild/
+.cxx/
